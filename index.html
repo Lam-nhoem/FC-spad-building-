@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiến Thuật Của Bạn - FC Mobile Squad Builder</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas for Exporting Pitch Image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-card { font-family: 'Teko', sans-serif; }
+
+        /* Realistic Pitch Background */
+        .pitch-green {
+            background: radial-gradient(circle at center, #1e8341 0%, #115e2b 70%, #0d4720 100%);
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+        }
+        .pitch-stripes {
+            background: linear-gradient(to bottom, 
+                rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.03) 10%, 
+                transparent 10%, transparent 20%, 
+                rgba(255,255,255,0.03) 20%, rgba(255,255,255,0.03) 30%, 
+                transparent 30%, transparent 40%, 
+                rgba(255,255,255,0.03) 40%, rgba(255,255,255,0.03) 50%, 
+                transparent 50%, transparent 60%, 
+                rgba(255,255,255,0.03) 60%, rgba(255,255,255,0.03) 70%, 
+                transparent 70%, transparent 80%, 
+                rgba(255,255,255,0.03) 80%, rgba(255,255,255,0.03) 90%, 
+                transparent 90%, transparent 100%);
+        }
+
+        /* FC Mobile Hexagon Shield Slot */
+        .shield-slot {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        /* Card Styles */
+        .card-gold {
+            background: linear-gradient(135deg, #fef08a 0%, #eab308 50%, #854d0e 100%);
+            border: 2px solid #fef08a;
+            color: #1e1b4b;
+        }
+        .card-silver {
+            background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 50%, #475569 100%);
+            border: 2px solid #f8fafc;
+            color: #0f172a;
+        }
+        .card-bronze {
+            background: linear-gradient(135deg, #fed7aa 0%, #c2410c 50%, #7c2d12 100%);
+            border: 2px solid #ffedd5;
+            color: #fff;
+        }
+        .card-icon {
+            background: linear-gradient(135deg, #e0e7ff 0%, #6366f1 50%, #312e81 100%);
+            border: 2px solid #a5b4fc;
+            color: #fff;
+        }
+
+        /* Hide scrollbars */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-[#121316] text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- TOP STEP NAVIGATION BAR -->
+    <header class="max-w-7xl mx-auto w-full px-4 py-4 flex items-center justify-between text-xs sm:text-sm border-b border-slate-800/60">
+        <button class="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-300 transition">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="flex items-center space-x-4 sm:space-x-8 font-medium">
+            <div class="flex items-center gap-2 text-slate-300">
+                <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-[10px]"><i class="fa-solid fa-check"></i></span>
+                <span class="hidden sm:inline">Set your plan</span>
+            </div>
+            <div class="w-8 sm:w-12 h-[1px] bg-slate-700"></div>
+            <div class="flex items-center gap-2 text-emerald-400 font-semibold">
+                <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400 text-emerald-400 flex items-center justify-center font-bold text-[10px]">2</span>
+                <span>Review your game plan</span>
+            </div>
+            <div class="w-8 sm:w-12 h-[1px] bg-slate-700"></div>
+            <div class="flex items-center gap-2 text-slate-500">
+                <span class="w-5 h-5 rounded-full border border-slate-700 text-slate-500 flex items-center justify-center font-bold text-[10px]">3</span>
+                <span class="hidden sm:inline">Start building your game</span>
+            </div>
+        </div>
+
+        <button onclick="switchView('builder')" class="px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+            Skip
+        </button>
+    </header>
+
+    <!-- MAIN HERO & PREVIEW DASHBOARD -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6 flex-grow w-full">
+        
+        <div id="view-dashboard" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            <!-- LEFT PANEL: White Aesthetic Poster Presentation (Matching Reference Image) -->
+            <div class="lg:col-span-7 bg-[#f8fafc] text-slate-900 rounded-3xl p-5 sm:p-6 shadow-2xl relative overflow-hidden">
+                
+                <!-- Poster Header -->
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 uppercase italic leading-none">
+                            CHIẾN THUẬT CỦA BẠN
+                        </h2>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">
+                            XÂY DỰNG ĐỘI HÌNH • SẮP XẾP CHIẾN THUẬT • TẠO NÊN ĐỘI BÓNG TRONG MƠ
+                        </p>
+                    </div>
+
+                    <div class="text-[10px] text-slate-500 space-y-1 text-right font-medium hidden sm:block">
+                        <div class="flex items-center justify-end gap-1"><i class="fa-solid fa-futbol text-emerald-600"></i> <span>Thể loại: Đội bóng / Squad Builder</span></div>
+                        <div class="flex items-center justify-end gap-1"><i class="fa-solid fa-mobile-screen text-slate-600"></i> <span>Nền tảng: Web & Mobile</span></div>
+                    </div>
+                </div>
+
+                <!-- Inner Layout Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                    
+                    <!-- Left: Mini Interactive Pitch Preview -->
+                    <div class="sm:col-span-7 flex flex-col items-center">
+                        <div class="pitch-green pitch-stripes relative w-full h-[360px] sm:h-[400px] rounded-2xl border-2 border-emerald-600/50 p-2 overflow-hidden flex flex-col justify-between">
+                            <!-- Pitch Lines -->
+                            <div class="absolute inset-1.5 border border-white/40 rounded-sm pointer-events-none"></div>
+                            <div class="absolute top-1/2 left-1.5 right-1.5 border-t border-white/40 pointer-events-none"></div>
+                            <div class="absolute top-1/2 left-1/2 w-20 h-20 border border-white/40 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                            <!-- Penalty Areas -->
+                            <div class="absolute top-1.5 left-1/2 -translate-x-1/2 w-32 h-14 border-b border-x border-white/40 pointer-events-none"></div>
+                            <div class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-32 h-14 border-t border-x border-white/40 pointer-events-none"></div>
+
+                            <!-- Pitch Slots -->
+                            <div id="preview-pitch-slots" class="relative w-full h-full z-10">
+                                <!-- Slots rendered dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Pitch Selected Formation Label -->
+                        <div class="mt-3 flex items-center gap-3 w-full">
+                            <div class="bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg font-card text-lg tracking-wider">
+                                4-3-3
+                            </div>
+                            <div class="text-[11px] text-slate-600 leading-tight">
+                                <strong class="block text-slate-800">ĐỘI HÌNH CƠ BẢN</strong>
+                                Cân bằng giữa tấn công và phòng ngự, phù hợp nhiều lối chơi.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Mini Formations & Player Cards Samples -->
+                    <div class="sm:col-span-5 flex flex-col justify-between space-y-3">
+                        
+                        <!-- Popular Formations Section -->
+                        <div>
+                            <h4 class="text-xs font-extrabold uppercase text-slate-800 tracking-wider mb-2 border-b border-slate-200 pb-1">
+                                CÁC SƠ ĐỒ PHỔ BIẾN
+                            </h4>
+                            <div class="grid grid-cols-3 gap-1.5">
+                                <div onclick="selectFormationPreview('4-3-3')" class="bg-emerald-800 rounded-lg p-1.5 text-center cursor-pointer hover:ring-2 ring-emerald-500 transition">
+                                    <div class="h-10 pitch-green rounded flex flex-col justify-around py-0.5 items-center">
+                                        <div class="flex gap-1"><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span></div>
+                                        <div class="flex gap-1"><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span></div>
+                                        <div class="flex gap-1"><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span></div>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-white block mt-1">4-3-3</span>
+                                </div>
+
+                                <div onclick="selectFormationPreview('4-4-2')" class="bg-emerald-800 rounded-lg p-1.5 text-center cursor-pointer hover:ring-2 ring-emerald-500 transition">
+                                    <div class="h-10 pitch-green rounded flex flex-col justify-around py-0.5 items-center">
+                                        <div class="flex gap-2"><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span></div>
+                                        <div class="flex gap-1"><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span></div>
+                                        <div class="flex gap-1"><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span></div>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-white block mt-1">4-4-2</span>
+                                </div>
+
+                                <div onclick="selectFormationPreview('3-5-2')" class="bg-emerald-800 rounded-lg p-1.5 text-center cursor-pointer hover:ring-2 ring-emerald-500 transition">
+                                    <div class="h-10 pitch-green rounded flex flex-col justify-around py-0.5 items-center">
+                                        <div class="flex gap-2"><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span></div>
+                                        <div class="flex gap-0.5"><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span></div>
+                                        <div class="flex gap-2"><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span><span class="w-1 h-1 bg-cyan-300 rounded-full"></span></div>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-white block mt-1">3-5-2</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Tiers Showcase -->
+                        <div>
+                            <h4 class="text-xs font-extrabold uppercase text-slate-800 tracking-wider mb-2 border-b border-slate-200 pb-1">
+                                THẺ CẦU THỦ
+                            </h4>
+                            <div class="grid grid-cols-3 gap-1.5">
+                                <!-- Gold Card -->
+                                <div class="card-gold rounded-xl p-1.5 text-center shadow">
+                                    <div class="flex justify-between items-center font-card text-xs leading-none">
+                                        <span class="font-bold text-sm">88</span>
+                                        <span class="font-bold">ST</span>
+                                    </div>
+                                    <div class="w-8 h-8 mx-auto rounded-full overflow-hidden bg-black/10 my-1">
+                                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Striker" class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="text-[8px] font-extrabold uppercase block truncate">Vàng HIẾM</span>
+                                </div>
+                                <!-- Silver Card -->
+                                <div class="card-silver rounded-xl p-1.5 text-center shadow">
+                                    <div class="flex justify-between items-center font-card text-xs leading-none">
+                                        <span class="font-bold text-sm">72</span>
+                                        <span class="font-bold">CM</span>
+                                    </div>
+                                    <div class="w-8 h-8 mx-auto rounded-full overflow-hidden bg-black/10 my-1">
+                                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Midfield" class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="text-[8px] font-extrabold uppercase block truncate">THẺ BẠC</span>
+                                </div>
+                                <!-- Bronze Card -->
+                                <div class="card-bronze rounded-xl p-1.5 text-center shadow">
+                                    <div class="flex justify-between items-center font-card text-xs leading-none">
+                                        <span class="font-bold text-sm">64</span>
+                                        <span class="font-bold">CB</span>
+                                    </div>
+                                    <div class="w-8 h-8 mx-auto rounded-full overflow-hidden bg-black/10 my-1">
+                                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Defender" class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="text-[8px] font-extrabold uppercase block truncate">THẺ ĐỒNG</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL: Hero Text & Interactive Call to Action (Matching Reference Image) -->
+            <div class="lg:col-span-5 flex flex-col justify-center space-y-6">
+                <div>
+                    <h1 class="text-4xl sm:text-6xl font-black text-white tracking-tight leading-none mb-4">
+                        Chiến Thuật Của Bạn
+                    </h1>
+                    <p class="text-slate-400 text-base sm:text-lg font-normal leading-relaxed">
+                        An app for building football formations and squads, in the style of FC Mobile's squad builder.
+                    </p>
+                </div>
+
+                <!-- Tags -->
+                <div class="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <span class="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/80">FOOTBALL</span>
+                    <span class="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/80">SQUAD BUILDER</span>
+                    <span class="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/80">FORMATION</span>
+                </div>
+
+                <!-- Start Building Button -->
+                <div class="pt-4">
+                    <button onclick="switchView('builder')" class="w-full py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-black text-lg transition duration-200 shadow-xl shadow-white/10 hover:shadow-white/20 flex items-center justify-center gap-2 group">
+                        <span>Start building</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FULL WORKSPACE / BUILDER VIEW (Hidden initially, toggled via Start Building) -->
+        <div id="view-builder" class="hidden grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- LEFT: Tactical Pitch Canvas (7 Cols) -->
+            <div class="lg:col-span-7 flex flex-col space-y-4">
+                
+                <!-- Controls Bar -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-xl">
+                    <div class="flex items-center space-x-2">
+                        <label class="text-xs text-slate-400 font-bold uppercase">Mặt sân:</label>
+                        <select id="builder-pitch-type" onchange="onPitchTypeChange()" class="bg-slate-950 border border-slate-700 text-emerald-400 font-bold text-xs rounded-lg px-2.5 py-1.5 focus:outline-none">
+                            <option value="5">Sân 5 Người</option>
+                            <option value="7">Sân 7 Người</option>
+                            <option value="11" selected>Sân 11 Người</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <label class="text-xs text-slate-400 font-bold uppercase">Sơ đồ:</label>
+                        <select id="builder-formation-select" onchange="onFormationChange()" class="bg-slate-950 border border-slate-700 text-emerald-400 font-bold text-xs rounded-lg px-2.5 py-1.5 focus:outline-none">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <button onclick="exportPitchImage()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-camera"></i> <span>Tải Ảnh Sân</span>
+                        </button>
+                        <button onclick="switchView('dashboard')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition">
+                            <i class="fa-solid fa-rotate-left"></i> Quay lại
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Pitch Area -->
+                <div id="builder-pitch-container" class="pitch-green pitch-stripes relative w-full h-[520px] sm:h-[620px] rounded-2xl border-4 border-slate-800 p-4 shadow-2xl overflow-hidden flex flex-col justify-between">
+                    <!-- Lines -->
+                    <div class="absolute inset-2 border-2 border-white/50 rounded pointer-events-none"></div>
+                    <div class="absolute top-1/2 left-2 right-2 border-t-2 border-white/50 pointer-events-none"></div>
+                    <div class="absolute top-1/2 left-1/2 w-32 h-32 border-2 border-white/50 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                    <!-- Penalty Areas -->
+                    <div class="absolute top-2 left-1/2 -translate-x-1/2 w-48 sm:w-56 h-20 border-b-2 border-x-2 border-white/50 pointer-events-none"></div>
+                    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-48 sm:w-56 h-20 border-t-2 border-x-2 border-white/50 pointer-events-none"></div>
+
+                    <!-- Dynamic Player Hexagon Slots -->
+                    <div id="builder-pitch-slots" class="relative w-full h-full z-10">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- Squad Bench Reserve Storage -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2 shadow-xl">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-users text-emerald-400"></i> Hàng Ghế Dự Bị (<span id="bench-count">0</span>)
+                        </h4>
+                        <span class="text-[11px] text-slate-500">Kéo cầu thủ thả lên vị trí trên sân</span>
+                    </div>
+
+                    <div id="bench-container" ondragover="allowDrop(event)" ondrop="dropToBench(event)" class="flex items-center gap-3 overflow-x-auto p-2 bg-slate-950/80 rounded-xl min-h-[100px] border border-slate-800/80 no-scrollbar">
+                        <!-- Bench cards rendered via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT: Player Creator & Fut Card Inspector (5 Cols) -->
+            <div class="lg:col-span-5 flex flex-col space-y-4">
+                
+                <!-- Card Inspector Preview -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col items-center shadow-xl">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Thẻ Cầu Thủ Preview</span>
+                    
+                    <div id="card-inspector" class="card-gold w-60 rounded-2xl p-3 relative shadow-2xl transition-all duration-300">
+                        <div class="flex justify-between items-start font-card">
+                            <div class="flex flex-col">
+                                <span id="card-ovr" class="text-4xl font-black leading-none">88</span>
+                                <span id="card-pos" class="text-xl font-bold uppercase tracking-wider">ST</span>
+                            </div>
+                            <span id="card-tier" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-black/20">VÀNG HIẾM</span>
+                        </div>
+
+                        <div class="my-1 flex justify-center">
+                            <div class="w-24 h-24 rounded-full border-2 border-white/50 overflow-hidden bg-black/20 shadow-md">
+                                <img id="card-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Player" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <h4 id="card-name" class="font-card text-2xl font-black uppercase truncate">CẦU THỦ</h4>
+                        </div>
+
+                        <div class="border-t border-black/20 my-2"></div>
+
+                        <!-- Stats Hex Grid -->
+                        <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 font-card text-lg font-bold px-1">
+                            <div class="flex justify-between"><span>PAC</span><span id="card-pac">85</span></div>
+                            <div class="flex justify-between"><span>DRI</span><span id="card-dri">88</span></div>
+                            <div class="flex justify-between"><span>SHO</span><span id="card-sho">90</span></div>
+                            <div class="flex justify-between"><span>DEF</span><span id="card-def">45</span></div>
+                            <div class="flex justify-between"><span>PAS</span><span id="card-pas">82</span></div>
+                            <div class="flex justify-between"><span>PHY</span><span id="card-phy">78</span></div>
+                        </div>
+
+                        <!-- Playstyle Badges -->
+                        <div id="card-playstyles" class="mt-2 pt-1 border-t border-black/20 flex flex-wrap justify-center gap-1 min-h-[22px]">
+                            <!-- Appended dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Creator -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-xl">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <h4 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-emerald-400"></i> Tạo / Sửa Cầu Thủ
+                        </h4>
+                        <button onclick="resetPlayerForm()" class="text-xs text-slate-400 hover:text-slate-200 underline">Xóa form</button>
+                    </div>
+
+                    <form id="player-form" onsubmit="savePlayer(event)" class="space-y-3 text-xs">
+                        <input type="hidden" id="form-player-id">
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-slate-400 mb-1">Tên Cầu Thủ</label>
+                                <input type="text" id="input-name" required placeholder="Ví dụ: Quang Hải" oninput="updateCardPreviewFromForm()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-400 mb-1">Vị Trí</label>
+                                <select id="input-pos" onchange="updateCardPreviewFromForm()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+                                    <option value="ST">ST - Tiền đạo</option>
+                                    <option value="RW">RW - Cánh phải</option>
+                                    <option value="LW">LW - Cánh trái</option>
+                                    <option value="CAM">CAM - Tiền vệ công</option>
+                                    <option value="CM" selected>CM - Tiền vệ trung tâm</option>
+                                    <option value="CDM">CDM - Tiền vệ thủ</option>
+                                    <option value="CB">CB - Trung vệ</option>
+                                    <option value="LB">LB - Hậu vệ trái</option>
+                                    <option value="RB">RB - Hậu vệ phải</option>
+                                    <option value="GK">GK - Thủ môn</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Card Tier Quality -->
+                        <div>
+                            <label class="block font-bold text-slate-400 mb-1">Loại Thẻ</label>
+                            <select id="input-tier" onchange="updateCardPreviewFromForm()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+                                <option value="gold" selected>Thẻ Vàng (Gold)</option>
+                                <option value="silver">Thẻ Bạc (Silver)</option>
+                                <option value="bronze">Thẻ Đồng (Bronze)</option>
+                                <option value="icon">Thẻ Đặc Biệt (Icon Special)</option>
+                            </select>
+                        </div>
+
+                        <!-- Stats Sliders Grid -->
+                        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
+                            <div>
+                                <div class="flex justify-between text-slate-400"><span>Pace</span><span id="lbl-pac" class="font-bold text-white">75</span></div>
+                                <input type="range" id="slider-pac" min="40" max="99" value="75" oninput="updateCardPreviewFromForm()" class="w-full accent-emerald-500">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-slate-400"><span>Shooting</span><span id="lbl-sho" class="font-bold text-white">70</span></div>
+                                <input type="range" id="slider-sho" min="40" max="99" value="70" oninput="updateCardPreviewFromForm()" class="w-full accent-emerald-500">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-slate-400"><span>Passing</span><span id="lbl-pas" class="font-bold text-white">80</span></div>
+                                <input type="range" id="slider-pas" min="40" max="99" value="80" oninput="updateCardPreviewFromForm()" class="w-full accent-emerald-500">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-slate-400"><span>Dribbling</span><span id="lbl-dri" class="font-bold text-white">78</span></div>
+                                <input type="range" id="slider-dri" min="40" max="99" value="78" oninput="updateCardPreviewFromForm()" class="w-full accent-emerald-500">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-slate-400"><span>Defending</span><span id="lbl-def" class="font-bold text-white">65</span></div>
+                                <input type="range" id="slider-def" min="40" max="99" value="65" oninput="updateCardPreviewFromForm()" class="w-full accent-emerald-500">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-slate-400"><span>Physical</span><span id="lbl-phy" class="font-bold text-white">72</span></div>
+                                <input type="range" id="slider-phy" min="40" max="99" value="72" oninput="updateCardPreviewFromForm()" class="w-full accent-emerald-500">
+                            </div>
+                        </div>
+
+                        <!-- Playstyle Checkboxes -->
+                        <div class="pt-2 border-t border-slate-800">
+                            <label class="block font-bold text-slate-400 mb-1">PlayStyles (Phong cách chơi)</label>
+                            <div class="grid grid-cols-2 gap-1 max-h-20 overflow-y-auto p-1 bg-slate-950 rounded border border-slate-800 text-[10px]">
+                                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="Finesse" onchange="updateCardPreviewFromForm()" class="ps-cb accent-emerald-500"> Finesse Shot</label>
+                                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="TikiTaka" onchange="updateCardPreviewFromForm()" class="ps-cb accent-emerald-500"> Tiki Taka</label>
+                                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="QuickStep" onchange="updateCardPreviewFromForm()" class="ps-cb accent-emerald-500"> Quick Step</label>
+                                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="PowerHeader" onchange="updateCardPreviewFromForm()" class="ps-cb accent-emerald-500"> Power Header</label>
+                                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="Trivela" onchange="updateCardPreviewFromForm()" class="ps-cb accent-emerald-500"> Trivela</label>
+                                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="Intercept" onchange="updateCardPreviewFromForm()" class="ps-cb accent-emerald-500"> Intercept</label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-lg shadow-emerald-500/20">
+                            Lưu Cầu Thủ Vào Kho
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="max-w-7xl mx-auto w-full px-4 py-4 border-t border-slate-800/60 text-center text-xs text-slate-500">
+        Chiến Thuật Của Bạn &copy; 2026 - FC Mobile Inspired Tactical Board
+    </footer>
+
+    <script>
+        // Formations Database
+        const FORMATIONS = {
+            "5": {
+                "1-2-1": [{pos: "GK", x: 50, y: 88}, {pos: "CB", x: 50, y: 68}, {pos: "LM", x: 22, y: 45}, {pos: "RM", x: 78, y: 45}, {pos: "ST", x: 50, y: 20}],
+                "2-2": [{pos: "GK", x: 50, y: 88}, {pos: "LB", x: 30, y: 68}, {pos: "RB", x: 70, y: 68}, {pos: "LW", x: 30, y: 28}, {pos: "RW", x: 70, y: 28}]
+            },
+            "7": {
+                "2-3-1": [{pos: "GK", x: 50, y: 88}, {pos: "LB", x: 28, y: 70}, {pos: "RB", x: 72, y: 70}, {pos: "LM", x: 20, y: 45}, {pos: "CM", x: 50, y: 48}, {pos: "RM", x: 80, y: 45}, {pos: "ST", x: 50, y: 20}],
+                "3-2-1": [{pos: "GK", x: 50, y: 88}, {pos: "CB", x: 50, y: 75}, {pos: "LB", x: 25, y: 70}, {pos: "RB", x: 75, y: 70}, {pos: "LCM", x: 35, y: 45}, {pos: "RCM", x: 65, y: 45}, {pos: "ST", x: 50, y: 20}]
+            },
+            "11": {
+                "4-3-3": [{pos: "GK", x: 50, y: 88}, {pos: "LB", x: 15, y: 72}, {pos: "CB1", x: 38, y: 75}, {pos: "CB2", x: 62, y: 75}, {pos: "RB", x: 85, y: 72}, {pos: "CDM", x: 50, y: 55}, {pos: "LCM", x: 32, y: 40}, {pos: "RCM", x: 68, y: 40}, {pos: "LW", x: 20, y: 22}, {pos: "ST", x: 50, y: 18}, {pos: "RW", x: 80, y: 22}],
+                "4-4-2": [{pos: "GK", x: 50, y: 88}, {pos: "LB", x: 15, y: 72}, {pos: "CB1", x: 38, y: 75}, {pos: "CB2", x: 62, y: 75}, {pos: "RB", x: 85, y: 72}, {pos: "LM", x: 18, y: 45}, {pos: "LCM", x: 38, y: 48}, {pos: "RCM", x: 62, y: 48}, {pos: "RM", x: 82, y: 45}, {pos: "LS", x: 35, y: 20}, {pos: "RS", x: 65, y: 20}],
+                "3-5-2": [{pos: "GK", x: 50, y: 88}, {pos: "CB1", x: 25, y: 75}, {pos: "CB2", x: 50, y: 78}, {pos: "CB3", x: 75, y: 75}, {pos: "LDM", x: 35, y: 58}, {pos: "RDM", x: 65, y: 58}, {pos: "LM", x: 15, y: 42}, {pos: "CAM", x: 50, y: 38}, {pos: "RM", x: 85, y: 42}, {pos: "LS", x: 35, y: 20}, {pos: "RS", x: 65, y: 20}]
+            }
+        };
+
+        // Initial State
+        let currentPitchType = "11";
+        let currentFormationName = "4-3-3";
+        let playersPool = [
+            { id: "p1", name: "Quang Hải", pos: "CAM", tier: "gold", pac: 82, sho: 85, pas: 88, dri: 86, def: 52, phy: 68, ovr: 84, playstyles: ["Finesse", "Trivela"] },
+            { id: "p2", name: "Hoàng Đức", pos: "CM", tier: "gold", pac: 78, sho: 79, pas: 86, dri: 84, def: 74, phy: 80, ovr: 83, playstyles: ["TikiTaka"] },
+            { id: "p3", name: "Tiến Linh", pos: "ST", tier: "gold", pac: 80, sho: 86, pas: 72, dri: 75, def: 42, phy: 82, ovr: 81, playstyles: ["PowerHeader"] },
+            { id: "p4", name: "Đoàn Văn Hậu", pos: "LB", tier: "silver", pac: 84, sho: 70, pas: 76, dri: 74, def: 82, phy: 88, ovr: 79, playstyles: ["Intercept"] },
+            { id: "p5", name: "Đặng Văn Lâm", pos: "GK", tier: "gold", pac: 65, sho: 40, pas: 68, dri: 50, def: 88, phy: 85, ovr: 84, playstyles: ["QuickStep"] }
+        ];
+        let activeLineup = {};
+
+        window.onload = function() {
+            renderDashboardPreviewPitch();
+            populateFormationSelect();
+            renderBuilderPitch();
+            renderBench();
+            updateCardPreviewFromForm();
+        };
+
+        function switchView(view) {
+            if (view === 'builder') {
+                document.getElementById('view-dashboard').classList.add('hidden');
+                document.getElementById('view-builder').classList.remove('hidden');
+                document.getElementById('view-builder').classList.add('grid');
+            } else {
+                document.getElementById('view-builder').classList.add('hidden');
+                document.getElementById('view-builder').classList.remove('grid');
+                document.getElementById('view-dashboard').classList.remove('hidden');
+            }
+        }
+
+        // Render Poster Mini Pitch
+        function renderDashboardPreviewPitch() {
+            const container = document.getElementById('preview-pitch-slots');
+            container.innerHTML = "";
+            const slots = FORMATIONS["11"]["4-3-3"];
+
+            slots.forEach((slot) => {
+                const el = document.createElement("div");
+                el.className = "absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center";
+                el.style.left = `${slot.x}%`;
+                el.style.top = `${slot.y}%`;
+
+                el.innerHTML = `
+                    <div class="w-7 h-8 sm:w-8 sm:h-9 bg-emerald-950/80 border-2 border-emerald-400 shield-slot flex items-center justify-center text-emerald-300 font-bold text-[10px] shadow-lg shadow-emerald-500/20">
+                        <i class="fa-solid fa-user text-[9px]"></i>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function selectFormationPreview(name) {
+            currentFormationName = name;
+            renderDashboardPreviewPitch();
+        }
+
+        // Builder Pitch Logic
+        function populateFormationSelect() {
+            const select = document.getElementById('builder-formation-select');
+            select.innerHTML = "";
+            const opts = FORMATIONS[currentPitchType];
+            Object.keys(opts).forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.innerText = key;
+                select.appendChild(opt);
+            });
+            currentFormationName = Object.keys(opts)[0];
+            select.value = currentFormationName;
+        }
+
+        function onPitchTypeChange() {
+            currentPitchType = document.getElementById('builder-pitch-type').value;
+            populateFormationSelect();
+            activeLineup = {};
+            renderBuilderPitch();
+            renderBench();
+        }
+
+        function onFormationChange() {
+            currentFormationName = document.getElementById('builder-formation-select').value;
+            renderBuilderPitch();
+        }
+
+        function renderBuilderPitch() {
+            const container = document.getElementById('builder-pitch-slots');
+            container.innerHTML = "";
+
+            const slots = FORMATIONS[currentPitchType][currentFormationName];
+
+            slots.forEach((slot, index) => {
+                const assignedId = activeLineup[index];
+                const player = playersPool.find(p => p.id === assignedId);
+
+                const el = document.createElement("div");
+                el.className = "absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center cursor-pointer transition";
+                el.style.left = `${slot.x}%`;
+                el.style.top = `${slot.y}%`;
+
+                el.setAttribute("ondragover", "allowDrop(event)");
+                el.setAttribute("ondrop", `dropToSlot(event, ${index})`);
+
+                if (player) {
+                    el.innerHTML = `
+                        <div draggable="true" ondragstart="dragPlayer(event, '${player.id}', ${index})" onclick="inspectPlayer('${player.id}')" class="relative group flex flex-col items-center">
+                            <div class="w-10 h-11 sm:w-12 sm:h-14 shield-slot bg-slate-900 border-2 border-emerald-400 flex items-center justify-center relative overflow-hidden shadow-xl">
+                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(player.name)}" class="w-full h-full object-cover">
+                                <span class="absolute bottom-0 right-0 bg-black text-amber-300 font-card text-[10px] px-0.5">${player.ovr}</span>
+                            </div>
+                            <span class="mt-0.5 bg-black/80 text-white font-bold text-[9px] px-1 rounded truncate max-w-[60px]">${player.name}</span>
+                            <button onclick="removeFromSlot(event, ${index})" class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-rose-600 text-white text-[8px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition">×</button>
+                        </div>
+                    `;
+                } else {
+                    el.innerHTML = `
+                        <div class="w-9 h-10 sm:w-11 sm:h-12 shield-slot border-2 border-dashed border-white/50 bg-black/20 flex flex-col items-center justify-center text-white/80 hover:bg-white/10 transition">
+                            <span class="text-[9px] font-bold uppercase">${slot.pos}</span>
+                        </div>
+                    `;
+                }
+
+                container.appendChild(el);
+            });
+        }
+
+        function renderBench() {
+            const container = document.getElementById('bench-container');
+            container.innerHTML = "";
+
+            const assignedIds = Object.values(activeLineup);
+            const benchPlayers = playersPool.filter(p => !assignedIds.includes(p.id));
+
+            document.getElementById('bench-count').innerText = benchPlayers.length;
+
+            if (benchPlayers.length === 0) {
+                container.innerHTML = `<span class="text-xs text-slate-500 italic p-2">Tất cả cầu thủ đã ở trên sân.</span>`;
+                return;
+            }
+
+            benchPlayers.forEach(player => {
+                const card = document.createElement("div");
+                card.className = "flex-shrink-0 bg-slate-900 border border-slate-700 hover:border-emerald-500 rounded-xl p-1.5 w-20 flex flex-col items-center cursor-grab active:cursor-grabbing transition shadow relative group";
+                card.setAttribute("draggable", "true");
+                card.setAttribute("ondragstart", `dragPlayer(event, '${player.id}', null)`);
+                card.setAttribute("onclick", `inspectPlayer('${player.id}')`);
+
+                card.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-slate-800 overflow-hidden mb-1 border border-slate-600">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(player.name)}" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-[10px] font-bold text-white truncate w-full text-center">${player.name}</span>
+                    <span class="text-[9px] text-emerald-400 font-card font-bold">${player.pos} • ${player.ovr}</span>
+                    <button onclick="deletePlayer(event, '${player.id}')" class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-rose-600 text-white text-[8px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition">×</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Drag & Drop
+        function allowDrop(ev) { ev.preventDefault(); }
+        function dragPlayer(ev, id, slot) {
+            ev.dataTransfer.setData("playerId", id);
+            if (slot !== null) ev.dataTransfer.setData("fromSlot", slot);
+        }
+        function dropToSlot(ev, slotIndex) {
+            ev.preventDefault();
+            const id = ev.dataTransfer.getData("playerId");
+            const fromSlot = ev.dataTransfer.getData("fromSlot");
+            if (fromSlot !== undefined && fromSlot !== "") delete activeLineup[fromSlot];
+            activeLineup[slotIndex] = id;
+            renderBuilderPitch();
+            renderBench();
+        }
+        function dropToBench(ev) {
+            ev.preventDefault();
+            const fromSlot = ev.dataTransfer.getData("fromSlot");
+            if (fromSlot !== undefined && fromSlot !== "") {
+                delete activeLineup[fromSlot];
+                renderBuilderPitch();
+                renderBench();
+            }
+        }
+        function removeFromSlot(ev, slotIndex) {
+            ev.stopPropagation();
+            delete activeLineup[slotIndex];
+            renderBuilderPitch();
+            renderBench();
+        }
+
+        // Card Preview
+        function updateCardPreviewFromForm() {
+            const name = document.getElementById('input-name').value || "CẦU THỦ";
+            const pos = document.getElementById('input-pos').value;
+            const tier = document.getElementById('input-tier').value;
+
+            const pac = parseInt(document.getElementById('slider-pac').value);
+            const sho = parseInt(document.getElementById('slider-sho').value);
+            const pas = parseInt(document.getElementById('slider-pas').value);
+            const dri = parseInt(document.getElementById('slider-dri').value);
+            const def = parseInt(document.getElementById('slider-def').value);
+            const phy = parseInt(document.getElementById('slider-phy').value);
+
+            document.getElementById('lbl-pac').innerText = pac;
+            document.getElementById('lbl-sho').innerText = sho;
+            document.getElementById('lbl-pas').innerText = pas;
+            document.getElementById('lbl-dri').innerText = dri;
+            document.getElementById('lbl-def').innerText = def;
+            document.getElementById('lbl-phy').innerText = phy;
+
+            const ovr = Math.round((pac + sho + pas + dri + def + phy) / 6);
+
+            document.getElementById('card-name').innerText = name;
+            document.getElementById('card-pos').innerText = pos;
+            document.getElementById('card-ovr').innerText = ovr;
+            document.getElementById('card-avatar').src = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(name)}`;
+
+            document.getElementById('card-pac').innerText = pac;
+            document.getElementById('card-sho').innerText = sho;
+            document.getElementById('card-pas').innerText = pas;
+            document.getElementById('card-dri').innerText = dri;
+            document.getElementById('card-def').innerText = def;
+            document.getElementById('card-phy').innerText = phy;
+
+            const card = document.getElementById('card-inspector');
+            card.className = `card-${tier} w-60 rounded-2xl p-3 relative shadow-2xl transition-all duration-300`;
+
+            const psContainer = document.getElementById('card-playstyles');
+            psContainer.innerHTML = "";
+            document.querySelectorAll('.ps-cb:checked').forEach(cb => {
+                const badge = document.createElement("span");
+                badge.className = "text-[8px] font-bold px-1.5 py-0.5 rounded bg-black/20 text-white";
+                badge.innerText = cb.value;
+                psContainer.appendChild(badge);
+            });
+        }
+
+        function savePlayer(e) {
+            e.preventDefault();
+            const id = document.getElementById('form-player-id').value || "p_" + Date.now();
+            const name = document.getElementById('input-name').value;
+            const pos = document.getElementById('input-pos').value;
+            const tier = document.getElementById('input-tier').value;
+
+            const pac = parseInt(document.getElementById('slider-pac').value);
+            const sho = parseInt(document.getElementById('slider-sho').value);
+            const pas = parseInt(document.getElementById('slider-pas').value);
+            const dri = parseInt(document.getElementById('slider-dri').value);
+            const def = parseInt(document.getElementById('slider-def').value);
+            const phy = parseInt(document.getElementById('slider-phy').value);
+            const ovr = Math.round((pac + sho + pas + dri + def + phy) / 6);
+
+            const playstyles = [];
+            document.querySelectorAll('.ps-cb:checked').forEach(cb => playstyles.push(cb.value));
+
+            const player = { id, name, pos, tier, pac, sho, pas, dri, def, phy, ovr, playstyles };
+
+            const idx = playersPool.findIndex(p => p.id === id);
+            if (idx >= 0) playersPool[idx] = player;
+            else playersPool.push(player);
+
+            renderBench();
+            renderBuilderPitch();
+            resetPlayerForm();
+        }
+
+        function inspectPlayer(id) {
+            const p = playersPool.find(x => x.id === id);
+            if (!p) return;
+
+            document.getElementById('form-player-id').value = p.id;
+            document.getElementById('input-name').value = p.name;
+            document.getElementById('input-pos').value = p.pos;
+            document.getElementById('input-tier').value = p.tier || "gold";
+
+            document.getElementById('slider-pac').value = p.pac;
+            document.getElementById('slider-sho').value = p.sho;
+            document.getElementById('slider-pas').value = p.pas;
+            document.getElementById('slider-dri').value = p.dri;
+            document.getElementById('slider-def').value = p.def;
+            document.getElementById('slider-phy').value = p.phy;
+
+            document.querySelectorAll('.ps-cb').forEach(cb => {
+                cb.checked = p.playstyles ? p.playstyles.includes(cb.value) : false;
+            });
+
+            updateCardPreviewFromForm();
+        }
+
+        function deletePlayer(e, id) {
+            e.stopPropagation();
+            playersPool = playersPool.filter(p => p.id !== id);
+            Object.keys(activeLineup).forEach(k => {
+                if (activeLineup[k] === id) delete activeLineup[k];
+            });
+            renderBench();
+            renderBuilderPitch();
+        }
+
+        function resetPlayerForm() {
+            document.getElementById('form-player-id').value = "";
+            document.getElementById('player-form').reset();
+            document.querySelectorAll('.ps-cb').forEach(cb => cb.checked = false);
+            updateCardPreviewFromForm();
+        }
+
+        function exportPitchImage() {
+            const container = document.getElementById('builder-pitch-container');
+            html2canvas(container).then(canvas => {
+                const a = document.createElement("a");
+                a.download = `Squad_Formation_${currentPitchType}v${currentPitchType}.png`;
+                a.href = canvas.toDataURL();
+                a.click();
+            });
+        }
+    </script>
+</body>
+</html>
