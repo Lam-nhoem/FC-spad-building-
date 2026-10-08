@@ -7,55 +7,122 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
     
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #0d0f12;
+      background-color: #0b0e14;
       color: #f3f4f6;
+      user-select: none;
     }
 
-    .pitch-bg {
-      background: radial-gradient(circle, #1a472a 0%, #0d2818 100%);
+    /* REALISTIC FOOTBALL PITCH STYLING */
+    .real-pitch {
+      background: #1e5128;
+      background-image: repeating-linear-gradient(
+        0deg,
+        #1e5128,
+        #1e5128 35px,
+        #163e1e 35px,
+        #163e1e 70px
+      );
       position: relative;
       overflow: hidden;
+      border: 3px solid rgba(255, 255, 255, 0.4);
+      box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.6);
     }
 
-    .pitch-lines {
-      background-image: 
-        linear-gradient(to right, rgba(255,255,255,0.12) 2px, transparent 2px),
-        linear-gradient(to bottom, rgba(255,255,255,0.12) 2px, transparent 2px);
-      background-size: 40px 40px;
+    /* Pitch markings */
+    .pitch-line {
+      position: absolute;
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      pointer-events: none;
     }
 
-    .fut-card {
-      background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-      border: 2px solid #374151;
+    .center-line {
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 0;
+      border-top: 2px solid rgba(255, 255, 255, 0.45);
+    }
+
+    .center-circle {
+      top: 50%;
+      left: 50%;
+      width: 100px;
+      height: 100px;
+      margin-top: -50px;
+      margin-left: -50px;
+      border-radius: 50%;
+    }
+
+    .penalty-area-top {
+      top: 0;
+      left: 25%;
+      right: 25%;
+      height: 18%;
+      border-top: none;
+    }
+
+    .penalty-area-bottom {
+      bottom: 0;
+      left: 25%;
+      right: 25%;
+      height: 18%;
+      border-bottom: none;
+    }
+
+    .goal-area-top {
+      top: 0;
+      left: 38%;
+      right: 38%;
+      height: 7%;
+      border-top: none;
+    }
+
+    .goal-area-bottom {
+      bottom: 0;
+      left: 38%;
+      right: 38%;
+      height: 7%;
+      border-bottom: none;
+    }
+
+    /* HEXAGON CARD SHAPES (FC MOBILE STYLE) */
+    .hex-card {
+      clip-path: polygon(50% 0%, 100% 22%, 100% 78%, 50% 100%, 0% 78%, 0% 22%);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, filter 0.2s ease;
+    }
+
+    .hex-slot-empty {
+      clip-path: polygon(50% 0%, 100% 22%, 100% 78%, 50% 100%, 0% 78%, 0% 22%);
+      background: rgba(6, 78, 59, 0.4);
+      border: 2px dashed rgba(52, 211, 153, 0.6);
       transition: all 0.2s ease;
     }
 
-    .fut-card-gold {
-      background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
-      border-color: #fef08a;
-      color: #ffffff;
+    .hex-slot-empty:hover {
+      background: rgba(16, 185, 129, 0.3);
+      border-color: #10b981;
+      transform: scale(1.08);
     }
 
-    .fut-card-silver {
-      background: linear-gradient(135deg, #9ca3af 0%, #4b5563 100%);
-      border-color: #f3f4f6;
-      color: #ffffff;
+    /* CARD THEMES */
+    .card-gold {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #78350f 100%);
+      color: #fff;
+    }
+    .card-silver {
+      background: linear-gradient(135deg, #9ca3af 0%, #6b7280 50%, #374151 100%);
+      color: #fff;
+    }
+    .card-bronze {
+      background: linear-gradient(135deg, #b45309 0%, #854d0e 50%, #451a03 100%);
+      color: #fff;
     }
 
-    .fut-card-bronze {
-      background: linear-gradient(135deg, #d97706 0%, #78350f 100%);
-      border-color: #fde68a;
-      color: #ffffff;
-    }
-
-    .hex-slot {
-      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    }
-
+    /* CUSTOM SCROLLBAR */
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
     }
@@ -64,61 +131,83 @@
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
       background: #374151;
-      border-radius: 3px;
+      border-radius: 4px;
+    }
+
+    /* PLAYSTYLE BADGE SHAPE */
+    .ps-badge {
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    }
+
+    /* CARD TOOLTIP ANIMATION */
+    .tooltip-pop {
+      animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.85) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between">
+<body class="min-h-screen flex flex-col justify-between relative">
 
-  <!-- TOP BAR / HEADER -->
-  <header class="border-b border-gray-800 bg-gray-900/90 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+  <!-- HEADER BAR -->
+  <header class="border-b border-gray-800 bg-gray-900/90 backdrop-blur sticky top-0 z-40 px-6 py-3 flex justify-between items-center">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center font-black text-black text-xl shadow-lg shadow-emerald-500/20">
         ⚽
       </div>
       <div>
         <h1 class="font-extrabold text-lg tracking-tight text-white flex items-center gap-2">
-          CHIẾN THUẬT CỦA BẠN <span class="text-xs font-semibold px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full">FC Mobile Style</span>
+          CHIẾN THUẬT CỦA BẠN <span class="text-xs font-bold px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full">FC Mobile Style</span>
         </h1>
-        <p class="text-xs text-gray-400">Tạo Cầu Thủ • Sa Bàn Chiến Thuật Sân 5 & 11 Người</p>
+        <p class="text-xs text-gray-400">Tạo Cầu Thủ • Sa Bàn Sân Cỏ • Lối Chơi PlayStyles</p>
       </div>
     </div>
 
-    <button onclick="copySourceCode()" class="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-4 py-2 rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
+    <button onclick="copySourceCode()" class="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold px-4 py-2 rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
       <i class="fa-solid fa-copy"></i>
       <span>Sao Chép Mã Nguồn (Copy Code)</span>
     </button>
   </header>
 
   <!-- MAIN WORKSPACE -->
-  <main class="max-w-7xl mx-auto w-full p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 my-auto">
+  <main class="max-w-7xl mx-auto w-full p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto">
     
     <!-- LEFT COLUMN: PLAYER CREATOR & INVENTORY -->
-    <section class="lg:col-span-4 space-y-6">
+    <section class="lg:col-span-4 space-y-5">
       
       <!-- PLAYER FORM -->
-      <div class="bg-gray-900 border border-gray-800 rounded-3xl p-5 shadow-2xl space-y-4">
+      <div class="bg-gray-900/90 border border-gray-800 rounded-3xl p-5 shadow-2xl space-y-4 backdrop-blur">
         <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
             <i class="fa-solid fa-user-plus text-emerald-400"></i>
-            <span>Tạo Cầu Thủ</span>
+            <span>Tạo Cầu Thủ Mới</span>
           </h2>
-          <button onclick="resetForm()" class="text-xs text-gray-400 hover:text-white underline">Xóa form</button>
+          <button onclick="resetForm()" class="text-xs text-gray-400 hover:text-white underline">Làm mới</button>
         </div>
 
         <form id="player-form" onsubmit="savePlayer(event)" class="space-y-3">
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-1">Tên Cầu Thủ</label>
-              <input type="text" id="input-name" required placeholder="Nhập tên..." class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+              <label class="block text-[11px] font-semibold text-gray-400 mb-1">Tên Cầu Thủ</label>
+              <input type="text" id="input-name" required placeholder="Nhập tên..." class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-1">Vị Trí Mặc Định</label>
-              <select id="input-pos" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+              <label class="block text-[11px] font-semibold text-gray-400 mb-1">Vị Trí Mặc Định</label>
+              <select id="input-pos" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500">
                 <option value="ST">ST - Tiền đạo</option>
+                <option value="LW">LW - Tiền đạo trái</option>
+                <option value="RW">RW - Tiền đạo phải</option>
                 <option value="CAM">CAM - Tiền vệ tấn công</option>
                 <option value="CM">CM - Tiền vệ trung tâm</option>
+                <option value="CDM">CDM - Tiền vệ phòng ngự</option>
+                <option value="LM">LM - Tiền vệ trái</option>
+                <option value="RM">RM - Tiền vệ phải</option>
                 <option value="CB">CB - Trung vệ</option>
+                <option value="LB">LB - Hậu vệ trái</option>
+                <option value="RB">RB - Hậu vệ phải</option>
                 <option value="GK">GK - Thủ môn</option>
               </select>
             </div>
@@ -126,12 +215,12 @@
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-1">Chỉ Số Tổng (OVR)</label>
-              <input type="number" id="input-ovr" min="50" max="99" value="85" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-sm text-amber-400 font-bold focus:outline-none focus:border-amber-500">
+              <label class="block text-[11px] font-semibold text-gray-400 mb-1">Chỉ Số Tổng (OVR)</label>
+              <input type="number" id="input-ovr" min="50" max="130" value="88" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-amber-400 font-black focus:outline-none focus:border-amber-500">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-1">Loại Thẻ</label>
-              <select id="input-cardtype" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+              <label class="block text-[11px] font-semibold text-gray-400 mb-1">Loại Thẻ</label>
+              <select id="input-cardtype" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500">
                 <option value="gold">Thẻ Vàng (Gold)</option>
                 <option value="silver">Thẻ Bạc (Silver)</option>
                 <option value="bronze">Thẻ Đồng (Bronze)</option>
@@ -139,22 +228,53 @@
             </div>
           </div>
 
+          <!-- PLAYSTYLES SELECTION -->
+          <div>
+            <label class="block text-[11px] font-semibold text-gray-400 mb-1">Lối Chơi (PlayStyles - Chọn tối đa 3)</label>
+            <div class="grid grid-cols-2 gap-1.5 text-[10px]" id="playstyles-container">
+              <label class="flex items-center gap-1.5 bg-gray-800/80 p-1.5 rounded-lg border border-gray-700 cursor-pointer hover:border-emerald-500">
+                <input type="checkbox" value="speed" class="ps-checkbox accent-emerald-500">
+                <span>⚡ Tốc Độ Cao</span>
+              </label>
+              <label class="flex items-center gap-1.5 bg-gray-800/80 p-1.5 rounded-lg border border-gray-700 cursor-pointer hover:border-emerald-500">
+                <input type="checkbox" value="power" class="ps-checkbox accent-emerald-500">
+                <span>💥 Sút Lực Khung</span>
+              </label>
+              <label class="flex items-center gap-1.5 bg-gray-800/80 p-1.5 rounded-lg border border-gray-700 cursor-pointer hover:border-emerald-500">
+                <input type="checkbox" value="pass" class="ps-checkbox accent-emerald-500">
+                <span>🎯 Chuyền Xé Gió</span>
+              </label>
+              <label class="flex items-center gap-1.5 bg-gray-800/80 p-1.5 rounded-lg border border-gray-700 cursor-pointer hover:border-emerald-500">
+                <input type="checkbox" value="dribble" class="ps-checkbox accent-emerald-500">
+                <span>🎨 Dẫn Bóng Dẻo</span>
+              </label>
+              <label class="flex items-center gap-1.5 bg-gray-800/80 p-1.5 rounded-lg border border-gray-700 cursor-pointer hover:border-emerald-500">
+                <input type="checkbox" value="block" class="ps-checkbox accent-emerald-500">
+                <span>🛡️ Cắt Bỏ Chuẩn</span>
+              </label>
+              <label class="flex items-center gap-1.5 bg-gray-800/80 p-1.5 rounded-lg border border-gray-700 cursor-pointer hover:border-emerald-500">
+                <input type="checkbox" value="stamina" class="ps-checkbox accent-emerald-500">
+                <span>🫁 Thể Lực Vô Hạn</span>
+              </label>
+            </div>
+          </div>
+
           <!-- STATS SLIDERS -->
-          <div class="space-y-2 pt-1">
+          <div class="space-y-2 pt-1 border-t border-gray-800">
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <div class="flex justify-between text-[11px] font-medium mb-1">
                   <span class="text-gray-300">Tốc độ (Pace)</span>
-                  <span id="val-pace" class="text-emerald-400 font-bold">80</span>
+                  <span id="val-pace" class="text-emerald-400 font-bold">85</span>
                 </div>
-                <input type="range" id="stat-pace" min="40" max="99" value="80" oninput="updateVal('pace')" class="w-full accent-emerald-500">
+                <input type="range" id="stat-pace" min="40" max="130" value="85" oninput="updateVal('pace')" class="w-full accent-emerald-500 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
               </div>
               <div>
                 <div class="flex justify-between text-[11px] font-medium mb-1">
                   <span class="text-gray-300">Sút (Shooting)</span>
-                  <span id="val-sho" class="text-emerald-400 font-bold">82</span>
+                  <span id="val-sho" class="text-emerald-400 font-bold">88</span>
                 </div>
-                <input type="range" id="stat-sho" min="40" max="99" value="82" oninput="updateVal('sho')" class="w-full accent-emerald-500">
+                <input type="range" id="stat-sho" min="40" max="130" value="88" oninput="updateVal('sho')" class="w-full accent-emerald-500 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
               </div>
             </div>
 
@@ -162,16 +282,16 @@
               <div>
                 <div class="flex justify-between text-[11px] font-medium mb-1">
                   <span class="text-gray-300">Chuyền (Passing)</span>
-                  <span id="val-pas" class="text-emerald-400 font-bold">85</span>
+                  <span id="val-pas" class="text-emerald-400 font-bold">82</span>
                 </div>
-                <input type="range" id="stat-pas" min="40" max="99" value="85" oninput="updateVal('pas')" class="w-full accent-emerald-500">
+                <input type="range" id="stat-pas" min="40" max="130" value="82" oninput="updateVal('pas')" class="w-full accent-emerald-500 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
               </div>
               <div>
                 <div class="flex justify-between text-[11px] font-medium mb-1">
                   <span class="text-gray-300">Rê bóng (Dribbling)</span>
-                  <span id="val-dri" class="text-emerald-400 font-bold">84</span>
+                  <span id="val-dri" class="text-emerald-400 font-bold">86</span>
                 </div>
-                <input type="range" id="stat-dri" min="40" max="99" value="84" oninput="updateVal('dri')" class="w-full accent-emerald-500">
+                <input type="range" id="stat-dri" min="40" max="130" value="86" oninput="updateVal('dri')" class="w-full accent-emerald-500 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
               </div>
             </div>
 
@@ -179,16 +299,16 @@
               <div>
                 <div class="flex justify-between text-[11px] font-medium mb-1">
                   <span class="text-gray-300">Phòng thủ (Defending)</span>
-                  <span id="val-def" class="text-emerald-400 font-bold">60</span>
+                  <span id="val-def" class="text-emerald-400 font-bold">65</span>
                 </div>
-                <input type="range" id="stat-def" min="40" max="99" value="60" oninput="updateVal('def')" class="w-full accent-emerald-500">
+                <input type="range" id="stat-def" min="40" max="130" value="65" oninput="updateVal('def')" class="w-full accent-emerald-500 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
               </div>
               <div>
                 <div class="flex justify-between text-[11px] font-medium mb-1">
                   <span class="text-gray-300">Thể lực (Physical)</span>
-                  <span id="val-phy" class="text-emerald-400 font-bold">75</span>
+                  <span id="val-phy" class="text-emerald-400 font-bold">80</span>
                 </div>
-                <input type="range" id="stat-phy" min="40" max="99" value="75" oninput="updateVal('phy')" class="w-full accent-emerald-500">
+                <input type="range" id="stat-phy" min="40" max="130" value="80" oninput="updateVal('phy')" class="w-full accent-emerald-500 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
               </div>
             </div>
           </div>
@@ -200,61 +320,107 @@
       </div>
 
       <!-- KHO CẦU THỦ -->
-      <div class="bg-gray-900 border border-gray-800 rounded-3xl p-5 shadow-2xl">
-        <h3 class="text-sm font-bold text-white mb-3 flex items-center justify-between">
-          <span>Kho Cầu Thủ (Bấm chọn xếp vào sân)</span>
-          <span id="player-count" class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">0</span>
+      <div class="bg-gray-900/90 border border-gray-800 rounded-3xl p-5 shadow-2xl backdrop-blur">
+        <h3 class="text-xs font-bold text-white mb-3 flex items-center justify-between">
+          <span class="uppercase tracking-wider">Kho Cầu Thủ (Bấm để chọn xếp)</span>
+          <span id="player-count" class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-extrabold">0</span>
         </h3>
-        <div id="player-list" class="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar p-1">
+        <div id="player-list" class="grid grid-cols-3 gap-2.5 max-h-[260px] overflow-y-auto custom-scrollbar p-1">
           <div class="text-gray-500 text-xs italic col-span-full text-center py-6">
-            Chưa có cầu thủ nào. Hãy tự tạo cầu thủ đầu tiên ở bảng trên nhé!
+            Chưa có cầu thủ nào. Hãy tạo cầu thủ đầu tiên ở form trên nhé!
           </div>
         </div>
       </div>
     </section>
 
     <!-- RIGHT COLUMN: TACTICAL PITCH BOARD -->
-    <section class="lg:col-span-8 bg-gray-900 border border-gray-800 rounded-3xl p-6 shadow-2xl space-y-4">
+    <section class="lg:col-span-8 bg-gray-900/90 border border-gray-800 rounded-3xl p-5 shadow-2xl space-y-4 backdrop-blur flex flex-col justify-between">
       
       <!-- PITCH CONTROLS -->
-      <div class="flex flex-wrap justify-between items-center gap-4 border-b border-gray-800 pb-4">
+      <div class="flex flex-wrap justify-between items-center gap-3 border-b border-gray-800 pb-3">
         <div>
-          <h2 class="text-xl font-bold text-white uppercase tracking-wider">Sa Bàn Chiến Thuật</h2>
-          <p class="text-xs text-gray-400">Chọn loại sân, sơ đồ và quản lý vị trí cầu thủ</p>
+          <h2 class="text-lg font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
+            <span>Sa Bàn Chiến Thuật</span>
+          </h2>
+          <p class="text-[11px] text-gray-400">Chọn sân 5v5 hoặc 11v11 & thay đổi sơ đồ</p>
         </div>
 
         <div class="flex items-center gap-2">
           <!-- RESET PITCH BUTTON -->
-          <button onclick="clearPitch()" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/30 font-bold text-xs px-3 py-2 rounded-xl transition">
-            <i class="fa-solid fa-rotate-left mr-1"></i> Xóa sạch sân
+          <button onclick="clearPitch()" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/30 font-bold text-xs px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Rút hết</span>
           </button>
 
           <!-- PITCH TYPE SELECTOR -->
-          <select id="pitch-type" onchange="changePitchType()" class="bg-gray-800 border border-gray-700 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none focus:border-emerald-500">
+          <select id="pitch-type" onchange="changePitchType()" class="bg-gray-800 border border-gray-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl focus:outline-none focus:border-emerald-500">
             <option value="5">Sân 5 Người (5v5)</option>
             <option value="11" selected>Sân 11 Người (11v11)</option>
           </select>
 
           <!-- FORMATION SELECTOR -->
-          <select id="formation-select" onchange="changeFormation()" class="bg-emerald-500 text-black font-extrabold text-xs px-3 py-2 rounded-xl focus:outline-none shadow-lg shadow-emerald-500/20">
+          <select id="formation-select" onchange="changeFormation()" class="bg-emerald-500 text-black font-extrabold text-xs px-3 py-1.5 rounded-xl focus:outline-none shadow-lg shadow-emerald-500/20">
           </select>
         </div>
       </div>
 
-      <!-- INTERACTIVE PITCH DISPLAY -->
-      <div class="relative w-full aspect-[4/3] pitch-bg rounded-2xl border-2 border-emerald-500/30 p-4 pitch-lines flex flex-col justify-between shadow-inner" id="pitch-container">
+      <!-- REAL FOOTBALL PITCH CONTAINER -->
+      <div class="relative w-full aspect-[4/3] real-pitch rounded-2xl p-2 flex flex-col justify-between shadow-2xl" id="pitch-container">
+        <!-- Lines -->
+        <div class="pitch-line center-line"></div>
+        <div class="pitch-line center-circle"></div>
+        <div class="pitch-line penalty-area-top"></div>
+        <div class="pitch-line penalty-area-bottom"></div>
+        <div class="pitch-line goal-area-top"></div>
+        <div class="pitch-line goal-area-bottom"></div>
+
+        <!-- Dynamic Hexagon Player Slots populated via JS -->
+        <div id="pitch-slots-layer" class="relative z-10 w-full h-full flex flex-col justify-between py-2"></div>
       </div>
 
-      <div class="text-center text-xs text-gray-400 italic">
-        * Hướng dẫn: Bấm vào cầu thủ trong kho để gán vào sân. Bấm vào cầu thủ trên sân để rút khỏi sân!
+      <div class="text-center text-[11px] text-gray-400 flex items-center justify-center gap-4">
+        <span><i class="fa-solid fa-mouse text-emerald-400"></i> Rê chuột / Nhấn giữ để xem <strong>Chỉ số & PlayStyles</strong></span>
+        <span>•</span>
+        <span><i class="fa-solid fa-hand-pointer text-amber-400"></i> Bấm thẻ trên sân để <strong>Rút khỏi sân</strong></span>
       </div>
     </section>
 
   </main>
 
+  <!-- HOVER / LONG PRESS CARD TOOLTIP POPUP -->
+  <div id="card-tooltip" class="fixed z-50 hidden pointer-events-none transition-opacity duration-150">
+    <div class="bg-gray-950 border-2 border-amber-400/80 rounded-2xl p-4 shadow-2xl w-64 tooltip-pop backdrop-blur-md">
+      <!-- Header -->
+      <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-2">
+        <div class="flex items-center gap-2">
+          <span id="tt-ovr" class="text-2xl font-black text-amber-400">90</span>
+          <div>
+            <div id="tt-name" class="font-bold text-xs text-white leading-none">Rivaldo</div>
+            <span id="tt-pos" class="text-[9px] font-extrabold text-emerald-400 uppercase">LW</span>
+          </div>
+        </div>
+        <span id="tt-cardtype" class="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">GOLD</span>
+      </div>
+
+      <!-- PlayStyles Badges -->
+      <div id="tt-playstyles" class="flex items-center gap-1.5 mb-3 min-h-[22px]">
+      </div>
+
+      <!-- Detailed 6 Stats Grid -->
+      <div class="grid grid-cols-2 gap-1.5 text-[10px] bg-gray-900/90 p-2 rounded-xl border border-gray-800 font-mono">
+        <div class="flex justify-between"><span class="text-gray-400">Tốc độ (PAC):</span><span id="tt-pac" class="font-bold text-emerald-400">88</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Sút (SHO):</span><span id="tt-sho" class="font-bold text-emerald-400">90</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Chuyền (PAS):</span><span id="tt-pas" class="font-bold text-emerald-400">84</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Rê bóng (DRI):</span><span id="tt-dri" class="font-bold text-emerald-400">89</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Phòng thủ (DEF):</span><span id="tt-def" class="font-bold text-emerald-400">55</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Thể lực (PHY):</span><span id="tt-phy" class="font-bold text-emerald-400">80</span></div>
+      </div>
+    </div>
+  </div>
+
   <!-- FOOTER -->
-  <footer class="border-t border-gray-800 text-center py-4 text-xs text-gray-500">
-    Chiến Thuật Của Bạn © 2026 — FC Mobile Inspired Tactical Board
+  <footer class="border-t border-gray-800 text-center py-3 text-[11px] text-gray-500">
+    Chiến Thuật Của Bạn © 2026 — FC Mobile Inspired Hexagon Tactical Board
   </footer>
 
   <script>
@@ -263,6 +429,15 @@
     let currentPitchType = '11';
     let currentFormation = '4-2-3-1';
     let squadSlots = {};
+
+    const PLAYSTYLE_ICONS = {
+      speed: { icon: '⚡', name: 'Tốc Độ Cao', color: 'bg-yellow-500/20 text-yellow-300' },
+      power: { icon: '💥', name: 'Sút Lực Khung', color: 'bg-red-500/20 text-red-300' },
+      pass: { icon: '🎯', name: 'Chuyền Xé Gió', color: 'bg-blue-500/20 text-blue-300' },
+      dribble: { icon: '🎨', name: 'Dẫn Bóng Dẻo', color: 'bg-purple-500/20 text-purple-300' },
+      block: { icon: '🛡️', name: 'Cắt Bỏ Chuẩn', color: 'bg-emerald-500/20 text-emerald-300' },
+      stamina: { icon: '🫁', name: 'Thể Lực Vô Hạn', color: 'bg-green-500/20 text-green-300' }
+    };
 
     const FORMATIONS = {
       '5': {
@@ -276,9 +451,17 @@
         '4-3-3': ['GK', 'LB', 'CB', 'CB', 'RB', 'CM', 'CDM', 'CM', 'LW', 'ST', 'RW'],
         '4-4-2': ['GK', 'LB', 'CB', 'CB', 'RB', 'LM', 'CM', 'CM', 'RM', 'ST', 'ST'],
         '3-5-2': ['GK', 'CB', 'CB', 'CB', 'CDM', 'CDM', 'LM', 'CAM', 'RM', 'ST', 'ST'],
-        '5-3-2': ['GK', 'LWB', 'CB', 'CB', 'CB', 'RWB', 'CM', 'CM', 'CM', 'ST', 'ST']
+        '5-3-2': ['GK', 'LB', 'CB', 'CB', 'CB', 'RB', 'CM', 'CM', 'CM', 'ST', 'ST']
       }
     };
+
+    // Limit PlayStyles Checkbox selection to max 3
+    document.querySelectorAll('.ps-checkbox').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const checked = document.querySelectorAll('.ps-checkbox:checked');
+        if (checked.length > 3) cb.checked = false;
+      });
+    });
 
     function initFormations() {
       const select = document.getElementById('formation-select');
@@ -305,12 +488,16 @@
 
     function savePlayer(e) {
       e.preventDefault();
+      
+      const playstyles = Array.from(document.querySelectorAll('.ps-checkbox:checked')).map(cb => cb.value);
+
       const p = {
         id: Date.now(),
         name: document.getElementById('input-name').value,
         pos: document.getElementById('input-pos').value,
         ovr: document.getElementById('input-ovr').value,
         cardType: document.getElementById('input-cardtype').value,
+        playstyles: playstyles,
         pace: document.getElementById('stat-pace').value,
         sho: document.getElementById('stat-sho').value,
         pas: document.getElementById('stat-pas').value,
@@ -326,6 +513,7 @@
 
     function resetForm() {
       document.getElementById('player-form').reset();
+      document.querySelectorAll('.ps-checkbox').forEach(cb => cb.checked = false);
       ['pace','sho','pas','dri','def','phy'].forEach(s => updateVal(s));
     }
 
@@ -333,7 +521,7 @@
       event.stopPropagation();
       players = players.filter(p => p.id !== id);
       
-      // Gỡ cầu thủ khỏi sân nếu đang đứng trên sân
+      // Unassign player from pitch if currently assigned
       Object.keys(squadSlots).forEach(slotIdx => {
         if (squadSlots[slotIdx] && squadSlots[slotIdx].id === id) {
           delete squadSlots[slotIdx];
@@ -353,17 +541,15 @@
 
     function handleSlotClick(slotIdx) {
       if (squadSlots[slotIdx]) {
-        // Nếu vị trí đã có cầu thủ -> Rút cầu thủ đó khỏi sân
         delete squadSlots[slotIdx];
       } else if (selectedPlayerId) {
-        // Nếu vị trí trống & đang chọn cầu thủ -> Gán vào sân
         const player = players.find(p => p.id === selectedPlayerId);
         if (player) {
           squadSlots[slotIdx] = player;
           selectedPlayerId = null;
         }
       } else {
-        alert("Hãy bấm chọn 1 cầu thủ ở Kho Cầu Thủ bên trái trước nhé!");
+        alert("Bấm chọn 1 cầu thủ ở Kho Cầu Thủ bên trái trước nhé!");
       }
       renderPlayers();
       renderPitch();
@@ -379,34 +565,37 @@
       document.getElementById('player-count').innerText = players.length;
 
       if (players.length === 0) {
-        list.innerHTML = `<div class="text-gray-500 text-xs italic col-span-full text-center py-6">Chưa có cầu thủ nào. Hãy tự tạo cầu thủ đầu tiên ở bảng trên nhé!</div>`;
+        list.innerHTML = `<div class="text-gray-500 text-xs italic col-span-full text-center py-6">Chưa có cầu thủ nào. Hãy tạo cầu thủ đầu tiên ở form trên nhé!</div>`;
         return;
       }
 
       list.innerHTML = players.map(p => `
-        <div onclick="selectPlayerForSquad(${p.id})" class="cursor-pointer fut-card ${p.cardType === 'gold' ? 'fut-card-gold' : p.cardType === 'silver' ? 'fut-card-silver' : 'fut-card-bronze'} p-2 rounded-xl relative shadow-md transition transform hover:scale-105 ${selectedPlayerId === p.id ? 'ring-4 ring-emerald-400' : ''}">
-          <button onclick="deletePlayerFromStorage(${p.id}, event)" title="Xóa khỏi kho" class="absolute -top-1 -right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] z-10 shadow">
+        <div onclick="selectPlayerForSquad(${p.id})" 
+             onmouseenter="showTooltip(event, ${p.id})" 
+             onmouseleave="hideTooltip()"
+             class="cursor-pointer hex-card ${p.cardType === 'gold' ? 'card-gold' : p.cardType === 'silver' ? 'card-silver' : 'card-bronze'} p-2.5 relative flex flex-col items-center justify-center text-center shadow-md ${selectedPlayerId === p.id ? 'ring-4 ring-emerald-400 scale-105 z-20' : ''}">
+          
+          <button onclick="deletePlayerFromStorage(${p.id}, event)" title="Xóa" class="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] z-30">
             <i class="fa-solid fa-xmark"></i>
           </button>
-          <div class="flex justify-between items-start">
-            <span class="text-lg font-black">${p.ovr}</span>
-            <span class="text-[10px] font-extrabold uppercase bg-black/40 px-1.5 py-0.5 rounded">${p.pos}</span>
-          </div>
-          <div class="text-center my-1 font-bold text-xs truncate">${p.name}</div>
-          <div class="grid grid-cols-3 gap-0.5 text-[8px] bg-black/30 p-1 rounded text-center font-mono">
-            <div>PAC ${p.pace}</div>
-            <div>SHO ${p.sho}</div>
-            <div>PAS ${p.pas}</div>
+
+          <span class="text-base font-black leading-none">${p.ovr}</span>
+          <span class="text-[9px] font-black uppercase text-amber-200 tracking-tighter">${p.pos}</span>
+          <div class="text-[10px] font-bold truncate max-w-full my-0.5">${p.name}</div>
+
+          <!-- Playstyle icons badge -->
+          <div class="flex gap-0.5 mt-0.5">
+            ${(p.playstyles || []).map(ps => `<span class="text-[8px]">${PLAYSTYLE_ICONS[ps]?.icon || ''}</span>`).join('')}
           </div>
         </div>
       `).join('');
     }
 
     function renderPitch() {
-      const container = document.getElementById('pitch-container');
+      const slotsLayer = document.getElementById('pitch-slots-layer');
       const positions = FORMATIONS[currentPitchType][currentFormation];
       
-      container.innerHTML = '';
+      slotsLayer.innerHTML = '';
 
       let rows = { attack: [], mid: [], def: [], gk: [] };
 
@@ -422,22 +611,27 @@
           ${rowItems.map(item => {
             const player = squadSlots[item.idx];
             return `
-              <div onclick="handleSlotClick(${item.idx})" class="cursor-pointer flex flex-col items-center group">
-                <div class="w-12 h-14 ${player ? 'bg-amber-500/90 border-amber-300 ring-2 ring-amber-400/50' : 'bg-emerald-500/20 border-emerald-400/60'} border-2 hex-slot flex flex-col items-center justify-center shadow-lg transition hover:scale-110 relative">
-                  ${player ? `
-                    <span class="font-extrabold text-xs text-white">${player.ovr}</span>
-                    <span class="text-[8px] truncate px-1 text-black font-bold max-w-full">${player.name}</span>
-                  ` : `
-                    <span class="font-bold text-xs text-emerald-300">${item.pos}</span>
-                  `}
-                </div>
+              <div onclick="handleSlotClick(${item.idx})" 
+                   ${player ? `onmouseenter="showTooltip(event, ${player.id})" onmouseleave="hideTooltip()"` : ''}
+                   class="cursor-pointer flex flex-col items-center group">
+                ${player ? `
+                  <div class="w-14 h-16 hex-card ${player.cardType === 'gold' ? 'card-gold' : player.cardType === 'silver' ? 'card-silver' : 'card-bronze'} flex flex-col items-center justify-center p-1 shadow-2xl transform hover:scale-110">
+                    <span class="font-black text-sm text-white leading-none">${player.ovr}</span>
+                    <span class="text-[9px] font-extrabold text-amber-200 uppercase">${item.pos}</span>
+                    <span class="text-[9px] font-extrabold truncate max-w-full text-white">${player.name}</span>
+                  </div>
+                ` : `
+                  <div class="w-12 h-14 hex-slot-empty flex flex-col items-center justify-center shadow-lg">
+                    <span class="font-black text-xs text-emerald-300 uppercase">${item.pos}</span>
+                  </div>
+                `}
               </div>
             `;
           }).join('')}
         </div>
       `;
 
-      container.innerHTML = `
+      slotsLayer.innerHTML = `
         ${renderRow(rows.attack)}
         ${renderRow(rows.mid)}
         ${renderRow(rows.def)}
@@ -445,15 +639,59 @@
       `;
     }
 
+    /* TOOLTIP POPUP FUNCTIONS */
+    function showTooltip(event, playerId) {
+      const player = players.find(p => p.id === playerId);
+      if (!player) return;
+
+      const tt = document.getElementById('card-tooltip');
+      
+      document.getElementById('tt-ovr').innerText = player.ovr;
+      document.getElementById('tt-name').innerText = player.name;
+      document.getElementById('tt-pos').innerText = player.pos;
+      document.getElementById('tt-cardtype').innerText = player.cardType.toUpperCase();
+      
+      document.getElementById('tt-pac').innerText = player.pace;
+      document.getElementById('tt-sho').innerText = player.sho;
+      document.getElementById('tt-pas').innerText = player.pas;
+      document.getElementById('tt-dri').innerText = player.dri;
+      document.getElementById('tt-def').innerText = player.def;
+      document.getElementById('tt-phy').innerText = player.phy;
+
+      const psContainer = document.getElementById('tt-playstyles');
+      if (player.playstyles && player.playstyles.length > 0) {
+        psContainer.innerHTML = player.playstyles.map(ps => {
+          const info = PLAYSTYLE_ICONS[ps];
+          return info ? `<span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${info.color}">${info.icon} ${info.name}</span>` : '';
+        }).join('');
+      } else {
+        psContainer.innerHTML = `<span class="text-[9px] text-gray-500 italic">Không có PlayStyles</span>`;
+      }
+
+      tt.classList.remove('hidden');
+
+      // Position Tooltip near cursor
+      const posX = Math.min(event.clientX + 15, window.innerWidth - 270);
+      const posY = Math.min(event.clientY - 40, window.innerHeight - 200);
+
+      tt.style.left = posX + 'px';
+      tt.style.top = posY + 'px';
+    }
+
+    function hideTooltip() {
+      document.getElementById('card-tooltip').classList.add('hidden');
+    }
+
     function copySourceCode() {
       const fullDoc = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
       navigator.clipboard.writeText(fullDoc).then(() => {
-        alert("Đã sao chép toàn bộ mã nguồn! Dán đè vào file index.html trên Mac và commit lên GitHub nhé.");
+        alert("Đã sao chép mã nguồn! Dán đè vào file index.html trên Mac và commit lên GitHub nhé.");
       }).catch(err => {
         alert("Lỗi sao chép tự động!");
       });
     }
 
+    // Initialize Default Data & Formations
     initFormations();
   </script>
 </body>
