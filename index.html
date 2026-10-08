@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chiến Thuật Của Bạn - FC Mobile Squad Builder</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     
@@ -139,7 +139,7 @@
             </div>
           </div>
 
-          <!-- VIETNAMESE STATS SLIDERS -->
+          <!-- STATS SLIDERS -->
           <div class="space-y-2 pt-1">
             <div class="grid grid-cols-2 gap-3">
               <div>
@@ -202,7 +202,7 @@
       <!-- KHO CẦU THỦ -->
       <div class="bg-gray-900 border border-gray-800 rounded-3xl p-5 shadow-2xl">
         <h3 class="text-sm font-bold text-white mb-3 flex items-center justify-between">
-          <span>Kho Cầu Thủ (Bấm để chọn xếp vào sân)</span>
+          <span>Kho Cầu Thủ (Bấm chọn xếp vào sân)</span>
           <span id="player-count" class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">0</span>
         </h3>
         <div id="player-list" class="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar p-1">
@@ -220,10 +220,15 @@
       <div class="flex flex-wrap justify-between items-center gap-4 border-b border-gray-800 pb-4">
         <div>
           <h2 class="text-xl font-bold text-white uppercase tracking-wider">Sa Bàn Chiến Thuật</h2>
-          <p class="text-xs text-gray-400">Chọn loại sân và sơ đồ chiến thuật mong muốn</p>
+          <p class="text-xs text-gray-400">Chọn loại sân, sơ đồ và quản lý vị trí cầu thủ</p>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+          <!-- RESET PITCH BUTTON -->
+          <button onclick="clearPitch()" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/30 font-bold text-xs px-3 py-2 rounded-xl transition">
+            <i class="fa-solid fa-rotate-left mr-1"></i> Xóa sạch sân
+          </button>
+
           <!-- PITCH TYPE SELECTOR -->
           <select id="pitch-type" onchange="changePitchType()" class="bg-gray-800 border border-gray-700 text-white text-xs font-bold px-3 py-2 rounded-xl focus:outline-none focus:border-emerald-500">
             <option value="5">Sân 5 Người (5v5)</option>
@@ -232,18 +237,16 @@
 
           <!-- FORMATION SELECTOR -->
           <select id="formation-select" onchange="changeFormation()" class="bg-emerald-500 text-black font-extrabold text-xs px-3 py-2 rounded-xl focus:outline-none shadow-lg shadow-emerald-500/20">
-            <!-- Dynamic options -->
           </select>
         </div>
       </div>
 
       <!-- INTERACTIVE PITCH DISPLAY -->
       <div class="relative w-full aspect-[4/3] pitch-bg rounded-2xl border-2 border-emerald-500/30 p-4 pitch-lines flex flex-col justify-between shadow-inner" id="pitch-container">
-        <!-- Dynamic Slots Generated via JS -->
       </div>
 
       <div class="text-center text-xs text-gray-400 italic">
-        * Hướng dẫn: Chọn cầu thủ từ kho để xếp trực tiếp vào vị trí tương ứng trên sân.
+        * Hướng dẫn: Bấm vào cầu thủ trong kho để gán vào sân. Bấm vào cầu thủ trên sân để rút khỏi sân!
       </div>
     </section>
 
@@ -326,23 +329,49 @@
       ['pace','sho','pas','dri','def','phy'].forEach(s => updateVal(s));
     }
 
+    function deletePlayerFromStorage(id, event) {
+      event.stopPropagation();
+      players = players.filter(p => p.id !== id);
+      
+      // Gỡ cầu thủ khỏi sân nếu đang đứng trên sân
+      Object.keys(squadSlots).forEach(slotIdx => {
+        if (squadSlots[slotIdx] && squadSlots[slotIdx].id === id) {
+          delete squadSlots[slotIdx];
+        }
+      });
+
+      if (selectedPlayerId === id) selectedPlayerId = null;
+
+      renderPlayers();
+      renderPitch();
+    }
+
     function selectPlayerForSquad(id) {
-      selectedPlayerId = id;
+      selectedPlayerId = selectedPlayerId === id ? null : id;
       renderPlayers();
     }
 
-    function assignPlayerToSlot(slotIdx) {
-      if (!selectedPlayerId) {
-        alert("Vui lòng chọn 1 cầu thủ từ Kho Cầu Thủ bên trái trước!");
-        return;
+    function handleSlotClick(slotIdx) {
+      if (squadSlots[slotIdx]) {
+        // Nếu vị trí đã có cầu thủ -> Rút cầu thủ đó khỏi sân
+        delete squadSlots[slotIdx];
+      } else if (selectedPlayerId) {
+        // Nếu vị trí trống & đang chọn cầu thủ -> Gán vào sân
+        const player = players.find(p => p.id === selectedPlayerId);
+        if (player) {
+          squadSlots[slotIdx] = player;
+          selectedPlayerId = null;
+        }
+      } else {
+        alert("Hãy bấm chọn 1 cầu thủ ở Kho Cầu Thủ bên trái trước nhé!");
       }
-      const player = players.find(p => p.id === selectedPlayerId);
-      if (player) {
-        squadSlots[slotIdx] = player;
-        selectedPlayerId = null;
-        renderPlayers();
-        renderPitch();
-      }
+      renderPlayers();
+      renderPitch();
+    }
+
+    function clearPitch() {
+      squadSlots = {};
+      renderPitch();
     }
 
     function renderPlayers() {
@@ -356,6 +385,9 @@
 
       list.innerHTML = players.map(p => `
         <div onclick="selectPlayerForSquad(${p.id})" class="cursor-pointer fut-card ${p.cardType === 'gold' ? 'fut-card-gold' : p.cardType === 'silver' ? 'fut-card-silver' : 'fut-card-bronze'} p-2 rounded-xl relative shadow-md transition transform hover:scale-105 ${selectedPlayerId === p.id ? 'ring-4 ring-emerald-400' : ''}">
+          <button onclick="deletePlayerFromStorage(${p.id}, event)" title="Xóa khỏi kho" class="absolute -top-1 -right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] z-10 shadow">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
           <div class="flex justify-between items-start">
             <span class="text-lg font-black">${p.ovr}</span>
             <span class="text-[10px] font-extrabold uppercase bg-black/40 px-1.5 py-0.5 rounded">${p.pos}</span>
@@ -376,7 +408,6 @@
       
       container.innerHTML = '';
 
-      // Simple grid rows distribution
       let rows = { attack: [], mid: [], def: [], gk: [] };
 
       positions.forEach((pos, idx) => {
@@ -391,10 +422,14 @@
           ${rowItems.map(item => {
             const player = squadSlots[item.idx];
             return `
-              <div onclick="assignPlayerToSlot(${item.idx})" class="cursor-pointer flex flex-col items-center">
-                <div class="w-12 h-14 ${player ? 'bg-amber-500/80 border-amber-300' : 'bg-emerald-500/20 border-emerald-400/60'} border-2 hex-slot flex flex-col items-center justify-center shadow-lg transition hover:scale-110">
-                  <span class="font-extrabold text-xs text-white">${player ? player.ovr : item.pos}</span>
-                  ${player ? `<span class="text-[8px] truncate px-1 text-black font-bold">${player.name}</span>` : ''}
+              <div onclick="handleSlotClick(${item.idx})" class="cursor-pointer flex flex-col items-center group">
+                <div class="w-12 h-14 ${player ? 'bg-amber-500/90 border-amber-300 ring-2 ring-amber-400/50' : 'bg-emerald-500/20 border-emerald-400/60'} border-2 hex-slot flex flex-col items-center justify-center shadow-lg transition hover:scale-110 relative">
+                  ${player ? `
+                    <span class="font-extrabold text-xs text-white">${player.ovr}</span>
+                    <span class="text-[8px] truncate px-1 text-black font-bold max-w-full">${player.name}</span>
+                  ` : `
+                    <span class="font-bold text-xs text-emerald-300">${item.pos}</span>
+                  `}
                 </div>
               </div>
             `;
@@ -419,7 +454,6 @@
       });
     }
 
-    // Initialize on load
     initFormations();
   </script>
 </body>
