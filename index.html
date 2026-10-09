@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
     
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -35,42 +35,38 @@
       border: 2px solid rgba(255, 255, 255, 0.25);
     }
 
-    /* LARGE FC CARD SHAPE */
+    /* LARGE FC CARD SHAPE - FC MOBILE STYLE */
     .fc-card-big {
-      width: 82px;
-      height: 118px;
+      width: 86px;
+      height: 124px;
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
-      border-bottom-left-radius: 36px;
-      border-bottom-right-radius: 36px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      border-bottom-left-radius: 38px;
+      border-bottom-right-radius: 38px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
       position: relative;
       overflow: hidden;
       transition: all 0.2s ease;
     }
 
     .fc-card-gold {
-      background: linear-gradient(180deg, #f59e0b 0%, #b45309 60%, #451a03 100%);
-      border: 2px solid #fef08a;
-      color: #ffffff;
+      background: radial-gradient(circle, #f59e0b 0%, #b45309 60%, #451a03 100%);
+      border: 2.5px solid #fef08a;
     }
 
     .fc-card-silver {
-      background: linear-gradient(180deg, #9ca3af 0%, #4b5563 60%, #111827 100%);
-      border: 2px solid #f3f4f6;
-      color: #ffffff;
+      background: radial-gradient(circle, #9ca3af 0%, #4b5563 60%, #111827 100%);
+      border: 2.5px solid #f3f4f6;
     }
 
     .fc-card-bronze {
-      background: linear-gradient(180deg, #d97706 0%, #78350f 60%, #290f02 100%);
-      border: 2px solid #fde68a;
-      color: #ffffff;
+      background: radial-gradient(circle, #d97706 0%, #78350f 60%, #290f02 100%);
+      border: 2.5px solid #fde68a;
     }
 
     .fc-card-gk {
-      background: linear-gradient(180deg, #06b6d4 0%, #0891b2 60%, #083344 100%);
-      border: 2px solid #a5f3fc;
-      color: #ffffff;
+      background: radial-gradient(circle, #06b6d4 0%, #0891b2 60%, #083344 100%);
+      border: 2.5px solid #a5f3fc;
     }
 
     .card-popup {
@@ -111,7 +107,7 @@
         <h1 class="font-extrabold text-lg tracking-tight text-white flex items-center gap-2">
           CHIẾN THUẬT CỦA BẠN <span class="text-xs font-semibold px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full">FC Mobile Style</span>
         </h1>
-        <p class="text-xs text-gray-400">Thẻ Cầu Thủ Lớn • Chèn Ảnh Tách Nền • Lưu Đội Hình Vĩnh Viễn</p>
+        <p class="text-xs text-gray-400">Thẻ Cầu Thủ Tách Nền PNG • Chèn Ảnh Nổi • Lưu Đội Hình Vĩnh Viễn</p>
       </div>
     </div>
 
@@ -182,9 +178,9 @@
 
           <!-- IMAGE UPLOAD / URL INPUT -->
           <div>
-            <label class="block text-xs font-semibold text-gray-400 mb-1">Ảnh Chân Dung (Chèn Link hoặc Chọn Tệp)</label>
+            <label class="block text-xs font-semibold text-gray-400 mb-1">Ảnh Cầu Thủ (Nên dùng ảnh PNG đã tách nền)</label>
             <div class="flex gap-2">
-              <input type="text" id="input-img-url" placeholder="Dán URL ảnh..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <input type="text" id="input-img-url" placeholder="Dán URL ảnh PNG..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500">
               <label class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold px-3 py-1.5 rounded-xl text-xs cursor-pointer flex items-center gap-1 border border-gray-700">
                 <i class="fa-solid fa-upload"></i>
                 <input type="file" id="input-img-file" accept="image/*" class="hidden" onchange="handleFileUpload(event)">
@@ -322,7 +318,6 @@
       }
     };
 
-    // LOCAL STORAGE PERSISTENCE
     function loadFromStorage() {
       try {
         const pData = localStorage.getItem('fc_builder_players');
@@ -649,32 +644,34 @@
             return `
               <div onclick="handleSlotClick(${item.idx})" class="cursor-pointer relative group flex flex-col items-center">
                 
-                <!-- CARD WITH BACKGROUND IMAGE & OVERLAY STATS -->
-                <div class="fc-card-big ${player ? (player.roleMode === 'gk' ? 'fc-card-gk' : player.cardType === 'gold' ? 'fc-card-gold' : player.cardType === 'silver' ? 'fc-card-silver' : 'fc-card-bronze') : 'bg-emerald-950/80 border-2 border-emerald-400/50'} flex flex-col justify-between p-1 text-center shadow-2xl">
+                <!-- CARD WITH TRANSPARENT PNG CUTOUT OVERLAY -->
+                <div class="fc-card-big ${player ? (player.roleMode === 'gk' ? 'fc-card-gk' : player.cardType === 'gold' ? 'fc-card-gold' : player.cardType === 'silver' ? 'fc-card-silver' : 'fc-card-bronze') : 'bg-emerald-950/80 border-2 border-emerald-400/50'} flex flex-col justify-between p-1 text-center shadow-2xl relative">
                   ${player ? `
-                    <!-- BACKGROUND PORTRAIT IMAGE -->
-                    <div class="absolute inset-0 z-0 flex items-center justify-center pt-2 overflow-hidden">
+                    <!-- BACKGROUND PORTRAIT PNG (FULL CUTOUT SPREAD) -->
+                    <div class="absolute inset-0 z-0 flex items-center justify-center overflow-hidden">
                       ${player.img ? `
-                        <img src="${player.img}" class="w-14 h-14 object-cover rounded-full border border-white/20 shadow" alt="">
+                        <img src="${player.img}" class="w-full h-full object-contain object-center transform scale-110" alt="">
                       ` : `
                         <div class="w-12 h-12 rounded-full border border-dashed border-white/40 flex items-center justify-center text-white/50 text-base">┼</div>
                       `}
                     </div>
 
                     <!-- TOP OVR & POSITION -->
-                    <div class="flex justify-between items-center px-1 pt-0.5 z-10 drop-shadow">
-                      <span class="font-black text-xs leading-none text-white">${player.ovr}</span>
-                      <span class="text-[8px] font-extrabold uppercase bg-black/50 text-white px-1 rounded">${player.pos}</span>
+                    <div class="flex justify-between items-start px-0.5 pt-0.5 z-10">
+                      <div class="flex flex-col text-left leading-none">
+                        <span class="font-black text-sm text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">${player.ovr}</span>
+                        <span class="text-[8px] font-black uppercase text-amber-300 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${player.pos}</span>
+                      </div>
+                      <span class="text-[8px] font-extrabold text-white/80 drop-shadow">#${player.num || 10}</span>
                     </div>
 
-                    <!-- CENTER NUMBER & NAME -->
-                    <div class="flex flex-col items-center my-auto z-10 drop-shadow">
-                      <span class="text-[9px] font-extrabold text-amber-300 leading-none">#${player.num || 10}</span>
-                      <span class="text-[9px] font-extrabold text-white truncate w-full px-0.5 mt-0.5 bg-black/40 rounded">${player.name}</span>
+                    <!-- CENTER PLAYER NAME OVERLAY -->
+                    <div class="mt-auto mb-1 z-10 px-0.5">
+                      <span class="text-[8px] font-black text-white uppercase truncate block w-full px-1 bg-black/60 backdrop-blur-xs rounded border border-white/10 drop-shadow">${player.name}</span>
                     </div>
 
-                    <!-- BOTTOM ALL 6 MINI STATS GRID OVERLAY -->
-                    <div class="bg-black/80 rounded-b-xl py-0.5 px-0.5 text-[6.5px] font-mono grid grid-cols-3 gap-0.5 z-10 text-white border-t border-white/10">
+                    <!-- BOTTOM ALL 6 MINI STATS OVERLAY -->
+                    <div class="bg-black/85 backdrop-blur-xs rounded-b-xl py-0.5 px-0.5 text-[6px] font-mono grid grid-cols-3 gap-0.5 z-10 text-white border-t border-white/10">
                       ${player.roleMode === 'field' ? `
                         <div>P:${player.s1}</div><div>S:${player.s2}</div><div>PA:${player.s3}</div>
                         <div>D:${player.s4}</div><div>DF:${player.s5}</div><div>PH:${player.s6}</div>
@@ -692,7 +689,7 @@
 
                 <!-- TOOLTIP POPUP -->
                 ${player ? `
-                  <div class="card-popup absolute bottom-32 bg-gray-950/95 border border-emerald-500/50 p-2.5 rounded-xl shadow-2xl text-[10px] w-48 z-50 text-white backdrop-blur-md">
+                  <div class="card-popup absolute bottom-34 bg-gray-950/95 border border-emerald-500/50 p-2.5 rounded-xl shadow-2xl text-[10px] w-48 z-50 text-white backdrop-blur-md">
                     <div class="flex justify-between items-center border-b border-gray-800 pb-1 mb-1.5 font-bold">
                       <span class="text-amber-400">${player.name} (${player.pos})</span>
                       <span class="text-emerald-400 font-mono">OVR ${player.ovr}</span>
