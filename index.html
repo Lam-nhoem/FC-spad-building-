@@ -15,15 +15,12 @@
       color: #f3f4f6;
     }
 
-    /* REALISTIC 3D GREEN PITCH */
     .pitch-3d {
       background: linear-gradient(180deg, #134e2a 0%, #0d381e 100%);
       position: relative;
-      overflow: hidden;
       box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
     }
 
-    /* Pitch Grass Stripes */
     .pitch-stripes {
       background: repeating-linear-gradient(
         0deg,
@@ -38,33 +35,43 @@
       border: 2px solid rgba(255, 255, 255, 0.25);
     }
 
-    /* HEXAGON SHIELD CARD FOR FC MOBILE */
-    .fc-hex-card {
-      clip-path: polygon(50% 0%, 100% 20%, 100% 80%, 50% 100%, 0% 80%, 0% 20%);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    /* LARGE FC CARD SHAPE BASED ON DRAWING */
+    .fc-card-big {
+      width: 76px;
+      height: 105px;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      border-bottom-left-radius: 32px;
+      border-bottom-right-radius: 32px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      position: relative;
+      transition: all 0.2s ease;
     }
 
-    .fc-gold {
-      background: linear-gradient(135deg, #f59e0b 0%, #b45309 50%, #78350f 100%);
+    .fc-card-gold {
+      background: linear-gradient(180deg, #f59e0b 0%, #b45309 60%, #451a03 100%);
       border: 2px solid #fef08a;
+      color: #ffffff;
     }
 
-    .fc-silver {
-      background: linear-gradient(135deg, #9ca3af 0%, #4b5563 50%, #1f2937 100%);
+    .fc-card-silver {
+      background: linear-gradient(180deg, #9ca3af 0%, #4b5563 60%, #111827 100%);
       border: 2px solid #f3f4f6;
+      color: #ffffff;
     }
 
-    .fc-bronze {
-      background: linear-gradient(135deg, #d97706 0%, #78350f 50%, #451a03 100%);
+    .fc-card-bronze {
+      background: linear-gradient(180deg, #d97706 0%, #78350f 60%, #290f02 100%);
       border: 2px solid #fde68a;
+      color: #ffffff;
     }
 
-    .fc-gk {
-      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #164e63 100%);
+    .fc-card-gk {
+      background: linear-gradient(180deg, #06b6d4 0%, #0891b2 60%, #083344 100%);
       border: 2px solid #a5f3fc;
+      color: #ffffff;
     }
 
-    /* CUSTOM TOOLTIP POPUP */
     .card-popup {
       opacity: 0;
       pointer-events: none;
@@ -93,7 +100,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-  <!-- TOP BAR / HEADER -->
+  <!-- TOP BAR -->
   <header class="border-b border-gray-800 bg-gray-950/90 backdrop-blur sticky top-0 z-50 px-6 py-3.5 flex justify-between items-center">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center font-black text-black text-xl shadow-lg shadow-emerald-500/20">
@@ -103,7 +110,7 @@
         <h1 class="font-extrabold text-lg tracking-tight text-white flex items-center gap-2">
           CHIẾN THUẬT CỦA BẠN <span class="text-xs font-semibold px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full">FC Mobile Style</span>
         </h1>
-        <p class="text-xs text-gray-400">Sa Bàn Sân Cỏ 3D • Thẻ Lục Giác • Tùy Chỉnh Cầu Thủ & Thủ Môn</p>
+        <p class="text-xs text-gray-400">Thẻ Cầu Thủ Lớn • Chỉnh Sửa Chỉ Số • Khe Lưu Đội Hình (Preset Slots)</p>
       </div>
     </div>
 
@@ -119,28 +126,28 @@
     <!-- LEFT COLUMN: CREATOR & INVENTORY -->
     <section class="lg:col-span-5 space-y-5">
       
-      <!-- CREATOR FORM -->
+      <!-- CREATOR / EDIT FORM -->
       <div class="bg-gray-900/90 border border-gray-800 rounded-3xl p-5 shadow-2xl space-y-4">
         
-        <!-- HEADER & GK SWITCH -->
         <div class="flex justify-between items-center border-b border-gray-800 pb-3">
           <div class="flex items-center gap-2">
-            <i class="fa-solid fa-user-gear text-emerald-400"></i>
-            <h2 class="text-base font-bold text-white">Tạo Cầu Thủ / Thủ Môn</h2>
+            <i class="fa-solid fa-user-pen text-emerald-400"></i>
+            <h2 id="form-title" class="text-base font-bold text-white">Tạo Cầu Thủ / Thủ Môn</h2>
           </div>
           
-          <!-- TOGGLE SWITCH FOR GK -->
           <div class="flex items-center bg-gray-950 p-1 rounded-xl border border-gray-800">
             <button id="btn-mode-field" onclick="setRoleMode('field')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition bg-emerald-500 text-black">
               Cầu Thủ
             </button>
             <button id="btn-mode-gk" onclick="setRoleMode('gk')" class="px-2.5 py-1 text-xs font-bold text-gray-400 hover:text-white rounded-lg transition">
-              Thủ Môn (GK)
+              Thủ Môn
             </button>
           </div>
         </div>
 
         <form id="player-form" onsubmit="savePlayer(event)" class="space-y-3">
+          <input type="hidden" id="editing-player-id" value="">
+
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-gray-400 mb-1">Tên Cầu Thủ</label>
@@ -149,7 +156,6 @@
             <div>
               <label class="block text-xs font-semibold text-gray-400 mb-1">Vị Trí Mặc Định</label>
               <select id="input-pos" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500">
-                <!-- Dynamic positions -->
               </select>
             </div>
           </div>
@@ -169,29 +175,30 @@
             </div>
           </div>
 
-          <!-- DYNAMIC STATS SLIDERS (FIELD VS GK) -->
-          <div id="stats-container" class="space-y-2 pt-1">
-            <!-- Injected via JavaScript -->
-          </div>
+          <!-- DYNAMIC STATS SLIDERS -->
+          <div id="stats-container" class="space-y-2 pt-1"></div>
 
-          <!-- PLAYSTYLES SELECTION -->
+          <!-- PLAYSTYLES -->
           <div>
             <label class="block text-xs font-semibold text-gray-400 mb-1.5">PlayStyles (Chọn tối đa 3 lối chơi)</label>
-            <div id="playstyles-container" class="grid grid-cols-2 gap-1.5 bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[11px]">
-              <!-- Dynamic checkboxes -->
-            </div>
+            <div id="playstyles-container" class="grid grid-cols-2 gap-1.5 bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[11px]"></div>
           </div>
 
-          <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-2.5 rounded-xl transition shadow-lg shadow-emerald-500/20 uppercase text-xs tracking-wider">
-            Lưu Vào Kho Cầu Thủ
-          </button>
+          <div class="flex gap-2 pt-1">
+            <button type="submit" id="btn-submit-player" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-2.5 rounded-xl transition shadow-lg shadow-emerald-500/20 uppercase text-xs tracking-wider">
+              Lưu Vào Kho Cầu Thủ
+            </button>
+            <button type="button" onclick="cancelEdit()" id="btn-cancel-edit" class="hidden bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold px-3 py-2.5 rounded-xl text-xs">
+              Hủy
+            </button>
+          </div>
         </form>
       </div>
 
-      <!-- INVENTORY -->
+      <!-- INVENTORY WITH EDIT OPTION -->
       <div class="bg-gray-900/90 border border-gray-800 rounded-3xl p-4 shadow-2xl">
         <h3 class="text-xs font-bold text-white mb-3 flex items-center justify-between">
-          <span>Kho Cầu Thủ (Bấm chọn xếp vào sân)</span>
+          <span>Kho Cầu Thủ (Bấm thẻ để chọn, Bấm Sửa để đổi chỉ số)</span>
           <span id="player-count" class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">0</span>
         </h3>
         <div id="player-list" class="grid grid-cols-2 gap-3 max-h-[220px] overflow-y-auto custom-scrollbar p-1">
@@ -202,46 +209,55 @@
       </div>
     </section>
 
-    <!-- RIGHT COLUMN: 3D PITCH BOARD -->
+    <!-- RIGHT COLUMN: 3D PITCH BOARD & PRESET SLOTS -->
     <section class="lg:col-span-7 bg-gray-900/90 border border-gray-800 rounded-3xl p-5 shadow-2xl space-y-4">
       
-      <!-- CONTROLS -->
-      <div class="flex flex-wrap justify-between items-center gap-3 border-b border-gray-800 pb-3">
-        <div>
-          <h2 class="text-base font-bold text-white uppercase tracking-wider">Sa Bàn Tương Tác 3D</h2>
-          <p class="text-[11px] text-gray-400">Rê chuột/Đè vào cầu thủ để xem chỉ số & PlayStyles</p>
+      <!-- CONTROLS & PRESET SLOTS -->
+      <div class="space-y-3 border-b border-gray-800 pb-3">
+        <div class="flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <h2 class="text-base font-bold text-white uppercase tracking-wider">Sa Bàn Tương Tác 3D</h2>
+            <p class="text-[11px] text-gray-400">Xếp cầu thủ, xem thông số & lưu đội hình đã xếp</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="clearPitch()" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/30 font-bold text-xs px-2.5 py-1.5 rounded-xl transition">
+              Xóa sân
+            </button>
+
+            <select id="pitch-type" onchange="changePitchType()" class="bg-gray-800 border border-gray-700 text-white text-xs font-bold px-2.5 py-1.5 rounded-xl">
+              <option value="5">Sân 5 (5v5)</option>
+              <option value="11" selected>Sân 11 (11v11)</option>
+            </select>
+
+            <select id="formation-select" onchange="changeFormation()" class="bg-emerald-500 text-black font-extrabold text-xs px-2.5 py-1.5 rounded-xl shadow-md">
+            </select>
+          </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <button onclick="clearPitch()" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/30 font-bold text-xs px-2.5 py-1.5 rounded-xl transition">
-            Xóa sân
-          </button>
-
-          <select id="pitch-type" onchange="changePitchType()" class="bg-gray-800 border border-gray-700 text-white text-xs font-bold px-2.5 py-1.5 rounded-xl">
-            <option value="5">Sân 5 (5v5)</option>
-            <option value="11" selected>Sân 11 (11v11)</option>
-          </select>
-
-          <select id="formation-select" onchange="changeFormation()" class="bg-emerald-500 text-black font-extrabold text-xs px-2.5 py-1.5 rounded-xl shadow-md">
-          </select>
+        <!-- PRESET SQUAD SLOTS (KHE LƯU ĐỘI HÌNH) -->
+        <div class="flex items-center gap-2 bg-gray-950 p-2 rounded-2xl border border-gray-800 text-xs">
+          <span class="font-bold text-gray-400 pl-1"><i class="fa-solid fa-floppy-disk text-emerald-400 mr-1"></i>Khe Đội Hình:</span>
+          <div class="flex gap-2">
+            <button onclick="savePresetSlot(1)" class="bg-gray-800 hover:bg-emerald-500 hover:text-black font-bold px-2.5 py-1 rounded-lg text-[11px]">Lưu Slot 1</button>
+            <button onclick="loadPresetSlot(1)" class="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-black font-bold px-2.5 py-1 rounded-lg text-[11px]">Slot 1</button>
+            <button onclick="savePresetSlot(2)" class="bg-gray-800 hover:bg-emerald-500 hover:text-black font-bold px-2.5 py-1 rounded-lg text-[11px]">Lưu Slot 2</button>
+            <button onclick="loadPresetSlot(2)" class="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-black font-bold px-2.5 py-1 rounded-lg text-[11px]">Slot 2</button>
+          </div>
         </div>
       </div>
 
-      <!-- REALISTIC GREEN 3D PITCH -->
+      <!-- REALISTIC PITCH DISPLAY WITH BIG CARDS -->
       <div class="relative w-full aspect-[4/3] pitch-3d pitch-stripes rounded-2xl border-2 border-emerald-500/40 p-4 flex flex-col justify-between shadow-2xl overflow-visible" id="pitch-container">
-        <!-- Pitch Center Circle -->
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full pitch-line pointer-events-none"></div>
-        <div class="absolute top-1/2 left-0 right-0 h-0.5 bg-white/20 pointer-events-none"></div>
       </div>
 
       <div class="text-center text-[11px] text-gray-400 italic">
-        * Bấm vào ô vị trí để gán cầu thủ từ kho. Bấm lại vào cầu thủ trên sân để rút ra khỏi sân.
+        * Bấm vào ô trống để gán cầu thủ. Bấm nút Sửa ở Kho Cầu Thủ để chỉnh chỉ số bất kỳ lúc nào!
       </div>
     </section>
 
   </main>
 
-  <!-- FOOTER -->
   <footer class="border-t border-gray-800 text-center py-3 text-xs text-gray-500">
     Chiến Thuật Của Bạn © 2026 — FC Mobile Inspired Tactical Board
   </footer>
@@ -249,10 +265,11 @@
   <script>
     let players = [];
     let selectedPlayerId = null;
-    let currentRoleMode = 'field'; // 'field' | 'gk'
+    let currentRoleMode = 'field';
     let currentPitchType = '11';
     let currentFormation = '4-2-3-1';
     let squadSlots = {};
+    let presetSlots = { 1: null, 2: null };
 
     const FIELD_POSITIONS = [
       { val: 'ST', label: 'ST - Tiền đạo cắm' },
@@ -266,12 +283,10 @@
       { val: 'RB', label: 'RB - Hậu vệ cánh phải' }
     ];
 
-    const GK_POSITIONS = [
-      { val: 'GK', label: 'GK - Thủ môn chính' }
-    ];
+    const GK_POSITIONS = [{ val: 'GK', label: 'GK - Thủ môn chính' }];
 
     const FIELD_PLAYSTYLES = ['Finesse Shot', 'Quick Step', 'Trivela', 'Tiki Taka', 'Power Header', 'Intercept'];
-    const GK_PLAYSTYLES = ['Footwork (Chân linh hoạt)', 'Far Throw (Ném xa)', 'Reflex Diver (Đổ người)', 'Cross Claimer (Bắt bóng bổng)', 'Rush Out (Băng ra)'];
+    const GK_PLAYSTYLES = ['Footwork (Chân linh hoạt)', 'Far Throw (Ném xa)', 'Reflex Diver (Đổ người)', 'Cross Claimer (Bắt bổng)', 'Rush Out (Băng ra)'];
 
     const FORMATIONS = {
       '5': {
@@ -291,7 +306,6 @@
 
     function setRoleMode(mode) {
       currentRoleMode = mode;
-      
       const btnField = document.getElementById('btn-mode-field');
       const btnGk = document.getElementById('btn-mode-gk');
 
@@ -364,30 +378,91 @@
       document.getElementById(valId).innerText = document.getElementById(id).value;
     }
 
+    function editPlayer(id, event) {
+      event.stopPropagation();
+      const p = players.find(x => x.id === id);
+      if (!p) return;
+
+      document.getElementById('editing-player-id').value = p.id;
+      setRoleMode(p.roleMode);
+
+      document.getElementById('input-name').value = p.name;
+      document.getElementById('input-pos').value = p.pos;
+      document.getElementById('input-ovr').value = p.ovr;
+      document.getElementById('input-cardtype').value = p.cardType;
+
+      document.getElementById('s1').value = p.s1; uV('s1', 'v-s1');
+      document.getElementById('s2').value = p.s2; uV('s2', 'v-s2');
+      document.getElementById('s3').value = p.s3; uV('s3', 'v-s3');
+      document.getElementById('s4').value = p.s4; uV('s4', 'v-s4');
+      document.getElementById('s5').value = p.s5; uV('s5', 'v-s5');
+      document.getElementById('s6').value = p.s6; uV('s6', 'v-s6');
+
+      document.querySelectorAll('.ps-cb').forEach(cb => {
+        cb.checked = p.playstyles.includes(cb.value);
+      });
+
+      document.getElementById('form-title').innerText = "Sửa Chỉ Số Cầu Thủ";
+      document.getElementById('btn-submit-player').innerText = "Lưu Cập Nhật Cầu Thủ";
+      document.getElementById('btn-cancel-edit').classList.remove('hidden');
+    }
+
+    function cancelEdit() {
+      document.getElementById('editing-player-id').value = "";
+      document.getElementById('player-form').reset();
+      document.getElementById('form-title').innerText = "Tạo Cầu Thủ / Thủ Môn";
+      document.getElementById('btn-submit-player').innerText = "Lưu Vào Kho Cầu Thủ";
+      document.getElementById('btn-cancel-edit').classList.add('hidden');
+      setRoleMode(currentRoleMode);
+    }
+
     function savePlayer(e) {
       e.preventDefault();
+      const editId = document.getElementById('editing-player-id').value;
       const psChecked = Array.from(document.querySelectorAll('.ps-cb:checked')).map(cb => cb.value);
 
-      const p = {
-        id: Date.now(),
-        roleMode: currentRoleMode,
-        name: document.getElementById('input-name').value,
-        pos: document.getElementById('input-pos').value,
-        ovr: document.getElementById('input-ovr').value,
-        cardType: document.getElementById('input-cardtype').value,
-        s1: document.getElementById('s1').value,
-        s2: document.getElementById('s2').value,
-        s3: document.getElementById('s3').value,
-        s4: document.getElementById('s4').value,
-        s5: document.getElementById('s5').value,
-        s6: document.getElementById('s6').value,
-        playstyles: psChecked
-      };
+      if (editId) {
+        // Update existing player
+        const p = players.find(x => x.id == editId);
+        if (p) {
+          p.roleMode = currentRoleMode;
+          p.name = document.getElementById('input-name').value;
+          p.pos = document.getElementById('input-pos').value;
+          p.ovr = document.getElementById('input-ovr').value;
+          p.cardType = document.getElementById('input-cardtype').value;
+          p.s1 = document.getElementById('s1').value;
+          p.s2 = document.getElementById('s2').value;
+          p.s3 = document.getElementById('s3').value;
+          p.s4 = document.getElementById('s4').value;
+          p.s5 = document.getElementById('s5').value;
+          p.s6 = document.getElementById('s6').value;
+          p.playstyles = psChecked;
+        }
+        cancelEdit();
+      } else {
+        // Create new player
+        const p = {
+          id: Date.now(),
+          roleMode: currentRoleMode,
+          name: document.getElementById('input-name').value,
+          pos: document.getElementById('input-pos').value,
+          ovr: document.getElementById('input-ovr').value,
+          cardType: document.getElementById('input-cardtype').value,
+          s1: document.getElementById('s1').value,
+          s2: document.getElementById('s2').value,
+          s3: document.getElementById('s3').value,
+          s4: document.getElementById('s4').value,
+          s5: document.getElementById('s5').value,
+          s6: document.getElementById('s6').value,
+          playstyles: psChecked
+        };
+        players.push(p);
+        document.getElementById('player-form').reset();
+        setRoleMode(currentRoleMode);
+      }
 
-      players.push(p);
       renderPlayers();
-      document.getElementById('player-form').reset();
-      setRoleMode(currentRoleMode);
+      renderPitch();
     }
 
     function deletePlayer(id, event) {
@@ -418,6 +493,20 @@
         alert("Hãy chọn 1 cầu thủ từ Kho Cầu Thủ bên trái trước nhé!");
       }
       renderPlayers();
+      renderPitch();
+    }
+
+    function savePresetSlot(slotNum) {
+      presetSlots[slotNum] = JSON.parse(JSON.stringify(squadSlots));
+      alert(`Đã lưu đội hình hiện tại vào Slot ${slotNum}!`);
+    }
+
+    function loadPresetSlot(slotNum) {
+      if (!presetSlots[slotNum]) {
+        alert(`Slot ${slotNum} đang trống, bạn chưa lưu đội hình vào đây!`);
+        return;
+      }
+      squadSlots = JSON.parse(JSON.stringify(presetSlots[slotNum]));
       renderPitch();
     }
 
@@ -456,13 +545,16 @@
 
       list.innerHTML = players.map(p => `
         <div onclick="selectPlayerForSquad(${p.id})" class="cursor-pointer bg-gray-800/80 border border-gray-700 p-2 rounded-xl relative hover:border-emerald-500 transition ${selectedPlayerId === p.id ? 'ring-2 ring-emerald-400' : ''}">
-          <button onclick="deletePlayer(${p.id}, event)" class="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px]">✕</button>
+          <div class="absolute -top-1 -right-1 flex gap-1">
+            <button onclick="editPlayer(${p.id}, event)" title="Sửa chỉ số" class="bg-amber-500 text-black font-bold rounded-full w-4 h-4 flex items-center justify-center text-[9px]">✎</button>
+            <button onclick="deletePlayer(${p.id}, event)" title="Xóa" class="bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px]">✕</button>
+          </div>
           <div class="flex justify-between items-center text-xs font-bold mb-1">
             <span class="text-amber-400">${p.ovr}</span>
             <span class="text-[10px] px-1 bg-black/40 rounded">${p.pos}</span>
           </div>
           <div class="text-xs font-semibold truncate text-white">${p.name}</div>
-          <div class="text-[9px] text-gray-400 truncate mt-1">${p.playstyles.length ? p.playstyles.join(', ') : 'Không có PlayStyle'}</div>
+          <div class="text-[9px] text-gray-400 truncate mt-1">${p.playstyles.length ? p.playstyles.join(', ') : 'Không PlayStyle'}</div>
         </div>
       `).join('');
     }
@@ -487,19 +579,32 @@
             return `
               <div onclick="handleSlotClick(${item.idx})" class="cursor-pointer relative group flex flex-col items-center">
                 
-                <!-- HEXAGON FC MOBILE CARD -->
-                <div class="w-12 h-14 fc-hex-card ${player ? (player.roleMode === 'gk' ? 'fc-gk' : player.cardType === 'gold' ? 'fc-gold' : player.cardType === 'silver' ? 'fc-silver' : 'fc-bronze') : 'bg-emerald-950/80 border-2 border-emerald-400/50'} flex flex-col items-center justify-center text-center p-0.5 shadow-xl">
+                <!-- CARD SHAPE AS DRAWN BY USER -->
+                <div class="fc-card-big ${player ? (player.roleMode === 'gk' ? 'fc-card-gk' : player.cardType === 'gold' ? 'fc-card-gold' : player.cardType === 'silver' ? 'fc-card-silver' : 'fc-card-bronze') : 'bg-emerald-950/80 border-2 border-emerald-400/50'} flex flex-col justify-between p-1 text-center shadow-2xl">
                   ${player ? `
-                    <span class="font-black text-xs text-white leading-none">${player.ovr}</span>
-                    <span class="text-[8px] font-extrabold text-black truncate w-full px-0.5 uppercase">${player.name}</span>
+                    <div class="flex justify-between items-center px-1 pt-0.5">
+                      <span class="font-black text-xs leading-none">${player.ovr}</span>
+                      <span class="text-[9px] font-extrabold uppercase bg-black/40 px-1 rounded">${player.pos}</span>
+                    </div>
+
+                    <div class="flex flex-col items-center my-auto">
+                      <div class="w-6 h-6 rounded-full bg-black/30 border border-white/30 flex items-center justify-center text-[10px]">👤</div>
+                      <span class="text-[9px] font-extrabold truncate w-full px-0.5 mt-0.5">${player.name}</span>
+                    </div>
+
+                    <div class="bg-black/40 rounded-b-xl py-0.5 px-1 text-[7px] font-mono leading-tight">
+                      ${player.roleMode === 'field' ? `PAC ${player.s1} • SHO ${player.s2}` : `REF ${player.s1} • POS ${player.s2}`}
+                    </div>
                   ` : `
-                    <span class="font-black text-xs text-emerald-300">${item.pos}</span>
+                    <div class="my-auto flex flex-col items-center">
+                      <span class="font-black text-xs text-emerald-300">${item.pos}</span>
+                    </div>
                   `}
                 </div>
 
-                <!-- POPUP STATS HOVER / HOLD TOOLTIP -->
+                <!-- TOOLTIP POPUP -->
                 ${player ? `
-                  <div class="card-popup absolute bottom-16 bg-gray-950/95 border border-emerald-500/50 p-2.5 rounded-xl shadow-2xl text-[10px] w-44 z-50 text-white backdrop-blur-md">
+                  <div class="card-popup absolute bottom-28 bg-gray-950/95 border border-emerald-500/50 p-2.5 rounded-xl shadow-2xl text-[10px] w-48 z-50 text-white backdrop-blur-md">
                     <div class="flex justify-between items-center border-b border-gray-800 pb-1 mb-1.5 font-bold">
                       <span class="text-amber-400">${player.name} (${player.pos})</span>
                       <span class="text-emerald-400 font-mono">OVR ${player.ovr}</span>
@@ -552,11 +657,10 @@
     function copySourceCode() {
       const fullDoc = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
       navigator.clipboard.writeText(fullDoc).then(() => {
-        alert("Đã sao chép mã nguồn! Bạn dán đè vào file index.html trên Mac rồi upload lên GitHub nhé.");
-      }).catch(() => alert("Không thể tự sao chép!"));
+        alert("Đã sao chép mã nguồn! Dán đè vào file index.html trên Mac rồi upload lên GitHub nhé.");
+      }).catch(() => alert("Lỗi tự động sao chép!"));
     }
 
-    // Init
     setRoleMode('field');
     initFormations();
   </script>
